@@ -1,0 +1,7 @@
+results
+plots
+.domino
+.dominoignore
+.dominoresults
+domino.log
+*.pkl

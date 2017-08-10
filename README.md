@@ -3,6 +3,10 @@ This repository is currently under construction and will include the source code
 
 Here is the current list of published papers:
 
+### [Why Does the Neocortex Have Layers and Columns, A Theory of Learning the 3D Structure of the World  • Jeff Hawkins, Subutai Ahmad & Yuwei Cui • Neuroscience • Preprint of journal submission • 2017/07/12][10]
+This paper proposes a network model composed of columns and layers that performs robust object learning and recognition. The model introduces a new feature to cortical columns, location information, which is represented relative to the object being sensed. Pairing sensory features with locations is a requirement for modeling objects and therefore must occur somewhere in the neocortex. We propose it occurs in every column in every region.
+> [Sources][10_src]
+---
 ### [Why Neurons Have Thousands of Synapses, A Theory of Sequence Memory in Neocortex • Jeff Hawkins & Subutai Ahmad • Neuroscience • Published in Frontiers in Neural Circuits Journal • 2016/03/30][9]
 Foundational paper describing core HTM theory for sequence memory and its relationship to the neocortex. Written with a neuroscience perspective, the paper explains why neurons need so many synapses and how networks of neurons can form a powerful sequence learning mechanism.
 > [Sources][9_src]
@@ -11,7 +15,7 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 Analysis of HTM sequence memory applied to various sequence learning and prediction problems. Written with a machine learning perspective, the paper contains some comparisons to statistical and Deep Learning techniques.
 > [Sources][8_src]
 ---
-## [Unsupervised Real-Time Anomaly Detection for Streaming Data • Subutai Ahmad, Alexander Lavin, Scott Purdy, Zuha Agha • Machine learning • Published in Neurocomputing, June 2017 • 2017/06/02][7]
+### [Unsupervised Real-Time Anomaly Detection for Streaming Data • Subutai Ahmad, Alexander Lavin, Scott Purdy, Zuha Agha • Machine learning • Published in Neurocomputing, June 2017 • 2017/06/02][7]
 This paper, which appears in a special issue of Neurocomputing, demonstrates how Numenta's online sequence memory algorithm, Hierarchical Temporal Memory, meets the requirements necessary for real-time anomaly detection in streaming data. It also presents results using the Numenta Anomaly Benchmark (NAB), the first open-source benchmark designed for testing anomaly detection algorithms on streaming data.
 > [Sources][7_src]
 ---
@@ -59,4 +63,6 @@ Recently there has been much interest in building custom hardware implementation
 [8_src]: neural_computation/continuous_online_sequence_learning_with_an_unsupervised_neural_network_model
 [9]: http://journal.frontiersin.org/article/10.3389/fncir.2016.00023/full
 [9_src]: frontiers/why_neurons_have_thousands_of_synapses
+[10]: http://www.biorxiv.org/content/early/2017/07/12/162263
+[10_src]: biorxiv/why_does_the_neocortex_have_layers_and_columns
 
