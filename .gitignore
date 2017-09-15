@@ -1,0 +1,5 @@
+*.pyc
+.idea
+.vscode
+.cache
+*.pkl
