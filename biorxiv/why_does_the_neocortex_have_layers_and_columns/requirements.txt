@@ -1,13 +1,2 @@
-matplotlib==1.5.1
-numpy==1.12.1
-pandas==0.18.1
-plotly==2.0.13
-prettytable==0.7.2
-
-simplejson==2.6.2
-tabulate==0.7.5
-tqdm==4.15.0
-plyfile==0.5
-scikit-learn==0.17
-
-htmresearch
+nupic==1.0.3
+htmresearch==0.0.2
