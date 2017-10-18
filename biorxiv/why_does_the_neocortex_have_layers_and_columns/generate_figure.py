@@ -29,7 +29,8 @@ http://www.biorxiv.org/content/early/2017/07/12/162263
 """
 
 import argparse
-
+import matplotlib
+matplotlib.use("Agg")
 import capacity_test
 import convergence_activity
 import multi_column_convergence
