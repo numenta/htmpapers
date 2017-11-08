@@ -77,11 +77,10 @@ python generate_figure.py 5A
 **Figure 6C**: Network capacity for one, two, and three cortical columns (CCs). The number of minicolumns in the input layer is 150, and the number of output cells is 4096. 
 
 -------------------------------------------------------------------------------
-* Jeff Hawkins, Subutai Ahmad, Yuwei Cui (2017)  Why Does the Neocortex Have Layers and Columns, a Theory of Learning the 
-3D Structure of the World, Preprint of journal submission. doi: 10.1101/162263.<br>
-http://www.biorxiv.org/content/early/2017/07/12/162263
+* A Theory of How Columns in the Neocortex Enable Learning the Structure of the World, 
+<br>Frontiers in Neural Circuits 11, 81. [doi:10.3389/FNCIR.2017.00081][1]
 
 
-[1]: http://www.biorxiv.org/content/early/2017/07/12/162263
+[1]: https://doi.org/10.3389/fncir.2017.00081
 [2]: https://github.com/numenta/htmresearch
 [3]: https://www.python.org/downloads
