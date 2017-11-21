@@ -1,0 +1,195 @@
+# Type of model that the rest of these parameters apply to.
+model: HTMPrediction
+
+# Version that specifies the format of the config.
+version: 1
+
+# The section "aggregationInfo" specifies what field to aggregate with which
+# aggregation method.
+#
+# Example of how to aggregate the field "consumption" with the method "mean"
+# and the field "gym" with the method "first". Both field will be
+# aggregated over a period of 1h 15m, according to their respective
+# aggregation methods.
+#
+#   aggregationInfo:
+#     fields:
+#     - [consumption, sum]
+#     - [gym, first]
+#     minutes: 15
+#     hours: 1
+#
+# See nupic.data.aggregator for more info about supported aggregation methods.
+aggregationInfo:
+  # "fields" should be a list of pairs. Each pair is a field name and an
+  # aggregation function (e.g. sum). The function will be used to aggregate
+  # multiple values of this field over the aggregation period.
+  fields: []
+  # If a time unit is not listed, 0 will be its default value.
+  microseconds: 0
+  milliseconds: 0
+  minutes: 0
+  months: 0
+  seconds: 0
+  hours: 0
+  days: 0
+  weeks: 0
+  years: 0
+
+predictAheadTime: null
+
+# Parameters of the model to be created.
+modelParams:
+
+  # The type of inference that this model will perform.
+  # Supported values are :
+  # - TemporalNextStep
+  # - TemporalClassification
+  # - NontemporalClassification
+  # - TemporalAnomaly
+  # - NontemporalAnomaly
+  # - TemporalMultiStep
+  # - NontemporalMultiStep
+  inferenceType: TemporalMultiStep
+
+  # Parameters of the Sensor region
+  sensorParams:
+    # Sensor diagnostic output verbosity control:
+    # - verbosity == 0: silent
+    # - verbosity in [1 .. 6]: increasing level of verbosity
+    verbosity: 0
+
+    # List of encoders and their parameters.
+    encoders:
+      _classifierInput:
+        classifierOnly: True
+        clipInput: True
+        fieldname: passenger_count
+        name: _classifierInput
+        maxval: 40000
+        minval: 0
+        n: 50
+        verbosity: 0
+        w: 29
+        type: ScalarEncoder
+      timeofday:
+        clipInput: True
+        fieldname: timeofday
+        name: timeofday
+        maxval: 1411
+        minval: 0
+        n: 600
+        periodic: True
+        verbosity: 0
+        w: 29
+        type: ScalarEncoder
+      dayofweek:
+        clipInput: True
+        fieldname: dayofweek
+        name: dayofweek
+        type: ScalarEncoder
+        maxval: 7
+        minval: 0
+        n: 100
+        periodic: True
+        verbosity: 0
+        w: 29
+      passenger_count:
+        fieldname: passenger_count
+        clipInput: True
+        name: passenger_count
+        maxval: 40000
+        minval: 0
+        n: 109
+        verbosity: 0
+        w: 29
+        type: ScalarEncoder
+
+    # The "sensorAutoReset" specifies the period for automatically generated
+    # resets from a RecordSensor.
+    #
+    # If None, disable automatically generated resets. Also disable for all
+    # values that evaluate to 0. Example:
+    #   sensorAutoReset: null
+    #
+    #
+    # Valid keys for the "sensorAutoReset" option:
+    #   sensorAutoReset:
+    #    days: <int>
+    #     hours: <int>
+    #     minutes: <int>
+    #     seconds: <int>
+    #     milliseconds: <int>
+    #     microseconds: <int>
+    #     weeks: <int>
+    #
+    # Example for an automated reset every 1.5 days:
+    #   sensorAutoReset:
+    #     days: 1
+    #     hours: 12
+    #
+    sensorAutoReset: null
+
+
+  # Controls whether the Spatial Pooler (SP) region is enabled.
+  spEnable: true
+
+  # Parameters of the SP region. For detailed descriptions of each
+  # parameter, see the API docs for
+  # nupic.algorithms.spatial_pooler.SpatialPooler. Note that the OPF
+  # will only create one-dimensional input and spatial pooling
+  # structures, so during SP creation `columnCount` translates to
+  # `columnDimensions=(columnCount,)` and
+  # `inputDimensions=(inputWidth,)`.
+  spParams:
+    columnCount: 2048
+    globalInhibition: 1
+    inputWidth: 0
+    boostStrength: 0.0
+    numActiveColumnsPerInhArea: 40
+    potentialPct: 0.8
+    seed: 1956
+    spVerbosity: 1
+    spatialImp: py
+    synPermConnected: 0.5
+    synPermActiveInc: 0.005
+    synPermInactiveDec: 0.002
+
+  # Controls whether the Temporal Memory (TM) region is enabled.
+  tmEnable: true
+
+  # Parameters of the TM region. For detailed descriptions of each
+  # parameter, see the API docs for
+  # nupic.algorithms.backtracking_tm.BacktrackingTM.
+  tmParams:
+    verbosity: 0
+    inputWidth: 2048
+    columnCount: 2048
+    cellsPerColumn: 32
+    seed: 1960
+    temporalImp: tm_cpp
+    newSynapseCount: 32
+    initialPerm: 0.21
+    permanenceInc: 0.1
+    permanenceDec: 0.1
+    predictedSegmentDecrement: 0.01
+    maxAge: 0
+    globalDecay: 0.0
+    maxSynapsesPerSegment: 32
+    maxSegmentsPerCell: 128
+    minThreshold: 15
+    activationThreshold: 15
+    outputType: normal
+    pamLength: 1
+
+  # Classifier parameters. For detailed descriptions of each parameter, see
+  # the API docs for nupic.algorithms.sdr_classifier.SDRClassifier.
+  clParams:
+    verbosity: 0
+    regionName: SDRClassifierRegion
+    alpha: 0.005
+    steps: '5'
+    implementation: py
+
+  # If set, don't create the SP network unless the user requests SP metrics.
+  trainSPNetOnlyIfRequested: false
