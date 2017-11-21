@@ -1,7 +1,11 @@
 Spatial Pooler Research
 =======================
 
-This repository contains research scripts for the HTM spatial pooler (SP).
+This repository contains research scripts for the following paper:
+
+The HTM Spatial Pooler—A Neocortical Algorithm for Online Sparse Distributed Coding
+https://www.frontiersin.org/articles/10.3389/fncom.2017.00111
+
 The goal is to demonstrate various computational properties of SP with
 artificial and real dataset.
 

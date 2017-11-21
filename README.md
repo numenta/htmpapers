@@ -11,5 +11,5 @@ This paper describes an important component of HTM, the HTM spatial pooler, whic
 
 [1]: https://doi.org/10.3389/fncir.2017.00081
 [1_src]: frontiers/a_theory_of_how_columns_in_the_neocortex_enable_learning_the_structure_of_the_world
-[2]: https://www.frontiersin.org/articles/10.3389/fncom.2017.00111/abstract
+[2]: https://www.frontiersin.org/articles/10.3389/fncom.2017.00111
 [2_src]: frontiers/the_htm_spatial_pooler_a_neocortical_algorithm_for_online_sparse_distributed_coding
