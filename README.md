@@ -9,7 +9,14 @@ This paper proposes a network model composed of columns and layers that performs
 This paper describes an important component of HTM, the HTM spatial pooler, which is a neurally inspired algorithm that learns sparse distributed representations online. Written from a neuroscience perspective, the paper demonstrates key computational properties of HTM spatial pooler.
 > [Sources][2_src]
 
+### [Evaluating Real-time Anomaly Detection Algorithms - the Numenta Anomaly Benchmark][3]
+14th IEEE ICMLA 2015 - This paper discusses how we should think about anomaly detection for streaming applications. It introduces a new open-source benchmark for detecting anomalies in real-time, time-series data.
+> [Sources][3_src]
+
 [1]: https://doi.org/10.3389/fncir.2017.00081
 [1_src]: frontiers/a_theory_of_how_columns_in_the_neocortex_enable_learning_the_structure_of_the_world
 [2]: https://www.frontiersin.org/articles/10.3389/fncom.2017.00111
 [2_src]: frontiers/the_htm_spatial_pooler_a_neocortical_algorithm_for_online_sparse_distributed_coding
+[3]: https://arxiv.org/abs/1510.03336
+[3_src]: https://github.com/numenta/NAB
+
