@@ -1,5 +1,5 @@
 # Numenta research papers code and data
-This repository is currently under construction and will include the source code for all scripts used on Numenta's papers.
+This repository contains reproducible code for selected Numenta papers. It is currently under construction and will eventually include the source code for all the scripts used in Numenta's papers.
 
 ### [A Theory of How Columns in the Neocortex Enable Learning the Structure of the World][1]
 This paper proposes a network model composed of columns and layers that performs robust object learning and recognition. The model introduces a new feature to cortical columns, location information, which is represented relative to the object being sensed. Pairing sensory features with locations is a requirement for modeling objects and therefore must occur somewhere in the neocortex. We propose it occurs in every column in every region.
@@ -14,7 +14,7 @@ This paper describes an important component of HTM, the HTM spatial pooler, whic
 > [Sources][3_src]
 
 ### [Unsupervised Real-Time Anomaly Detection for Streaming Data][4]
-This paper demonstrates how Numenta's online sequence memory algorithm, HTM, meets the requirements necessary for real-time anomaly detection in streaming data. It presents results using the Numenta Anomaly Benchmark (NAB), the first open-source benchmark designed for testing real-time anomaly detection algorithms.
+This paper discusses the requirements necessary for real-time anomaly detection in streaming data, and demonstrates how Numenta's online sequence memory algorithm, HTM, meets those requirements. It presents detailed results using the Numenta Anomaly Benchmark (NAB), the first open-source benchmark designed for testing real-time anomaly detection algorithms.
 > [Sources][4_src]
 
 [1]: https://doi.org/10.3389/fncir.2017.00081

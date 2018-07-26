@@ -1,4 +1,4 @@
-# Unsupervised Real-Time Anomaly Detection for Streaming Data, Neurocomputing Volume 262, 1 November 2017, Pages 134-147.<br>[doi:10.1016/j.neucom.2017.04.070][1]
+# Ahmad, S., Lavin, A., Purdy, S., & Agha, Z. (2017) Unsupervised real-time anomaly detection for streaming data. Neurocomputing, 262, 134–147. [doi:10.1016/j.neucom.2017.04.070][1] (Open Access paper)
 
 Installing NAB
 --------------
@@ -27,6 +27,8 @@ usage: nab-plot [-h] [--value {value,raw,likelihood}] [--start START]
                 [--height HEIGHT] [--offline] [--output OUTPUT]
                 file
 ```
+
+You can generate all plots at once using the `generate_plots.sh` script or generate each individual figure using the instructions below.
 
 ### Figure 1: Real-world temperature sensor data from an internal component of a large industrial machine
 
