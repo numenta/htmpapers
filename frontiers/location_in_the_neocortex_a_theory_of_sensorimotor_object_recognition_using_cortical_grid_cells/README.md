@@ -2,9 +2,22 @@
 
 Below are instructions for reproducing the charts and data-driven figures in the paper.
 
-## Installing HTM Research Library
+## Prerequisites
 
-All the scripts in this directory depend on Numenta's [HTM Research library](https://github.com/numenta/htmresearch) that runs on Python 2.7. See the library's Github repository for installation instructions.
+1.  Installing HTM Research Library
+
+All the scripts in this directory depend on Numenta's [htmresearch library](https://github.com/numenta/htmresearch) that runs on Python 2.7. See the library's Github repository for installation instructions.
+
+2. Running in Docker
+
+There is an included Dockerfile that can be built. It will include the scripts in this directoy that can be run inside the container as follows:
+
+    docker build -t IMAGE_NAME .
+    docker run IMAGE_NAME COMMAND
+
+"IMAGE_NAME" may be whatever you want. "COMMAND" will be one of the shell
+script commands listed below. The resulting charts will be saved to the
+`charts` directory (outside the container).
 
 ## Figures 5A, 5B, and 6A
 
@@ -119,3 +132,30 @@ are numbers of learned objects, given 10 locations per object and
 sizes that will be invoked by each object. With different
 statistics, these curves will shift relative to the bottom ticks, but
 they should stay approximately fixed relative to the top ticks.
+
+## Figure S1
+
+Generate with:
+
+    runGaussian_featureDistributions.sh
+
+TODO: Show image
+
+**Figure S1.** Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects. The
+breaking point is much more consistent relative to the number of locations recalled by object features. In these charts we use a single
+model and test on 6 different distributions of objects. The model uses 10 modules with 10x10 cells per module. **(Left)** The network’s
+capacity depends on the statistics of objects. The network's performance begins to break down after a certain number of objects, and
+this breaking point can vary by orders of magnitude with different object distributions. **(Right)** This breaking point varies significantly
+less when described in terms of "number of locations recalled by a sensation" rather than "number of objects learned." Using the same
+data from the first chart, for each object we measure the total number of occurrences of the object's rarest feature, and we plot
+recognition accuracy against this number. With each of these object distributions, the model reaches its breaking point when the
+number of recalled locations is within a small interval – conservatively, between 7 and 15. There is still some variation due to the
+statistics of the object's other features (not just its rarest feature), but the number of occurrences of the rarest feature provides a good
+first approximation for whether the network will recognize the object. **(Object descriptions)** Each object set had 100 unique features
+and 10 features per object, except where otherwise noted. The first three sets generate objects using the same strategy as all the other
+simulations, varying the parameters. The last three use different strategies. Object Set 1: baseline. Object Set 2: 40 unique features
+rather than 100. Object Set 3: 5 features per object rather than 10. Object Set 4: Every feature occurs the same number of times, +/- 1,
+rather than each object being randomly selected set of features with replacement. Object Set 5: Bimodal distribution of features,
+probabilistic. Divide features into two equal-sized pools, choose features from the second pool more often than features from the first.
+Object Set 6: Bimodal distribution of features, enforced structure. The features are divided equally into pools. Each object consists of
+one feature from the first pool and nine from the second.
