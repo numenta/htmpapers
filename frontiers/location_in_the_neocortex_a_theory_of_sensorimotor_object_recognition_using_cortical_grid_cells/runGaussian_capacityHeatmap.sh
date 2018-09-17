@@ -5,6 +5,6 @@ set -e -x
 cd "$(dirname "$0")"
 pwd
 
-python run_capacity_heatmap.py --bumpType gaussian --resultName results/capacityHeatmap_gaussian.json --repeat 1
+python run_capacity_heatmap.py --bumpType gaussian --resultName results/capacityHeatmap_gaussian.json --repeat 5
 
 python plot_capacity_heatmap.py --inFile results/capacityHeatmap_gaussian.json --outFile capacityHeatmap_gaussian.pdf
