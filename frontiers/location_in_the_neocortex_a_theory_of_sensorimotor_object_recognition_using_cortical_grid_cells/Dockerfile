@@ -28,5 +28,8 @@ RUN pip install -r /home/requirements.txt
 COPY . /home/
 WORKDIR /home/
 
+# Use matplotib 'Agg' backend
+ENV MPLBACKEND "Agg"
+
 # Export results
 VOLUME /home/charts/
