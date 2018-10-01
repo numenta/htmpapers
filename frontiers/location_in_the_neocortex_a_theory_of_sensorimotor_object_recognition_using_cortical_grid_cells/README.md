@@ -55,7 +55,7 @@ activity shifts with each movement but remains unique to the
 object being sensed. (These simulations used a unique feature
 pool of size 40.)
 
-![Averaged activation density after each sensation](github_images/narrowing_aggregated_gaussian.png)
+<img alt="Averaged activation density after each sensation" src="github_images/narrowing_aggregated_gaussian.png" width=400 />
 
 **Figure 6. (A)** With multiple sensations, the location layer activity converges to a sparse representation. Using the same simulation
 from Figure 5, we show the activation density after each sensation, averaged across all objects and modules. With additional
@@ -69,7 +69,7 @@ Generate with:
 
     ./runGaussian_comparisonToIdeal.sh
 
-![Comparison of the network's performance relative to ideal and bag-of-features models](github_images/comparisonToIdeal_gaussian.png)
+<img alt="Comparison of the network's performance relative to ideal and bag-of-features models" src="github_images/comparisonToIdeal_gaussian.png" width=400 />
 
 **Figure 6. (B)** Comparison of this network’s performance with the ideal
 observer and a bag-of-features detector. Each model learned 100 objects from a
@@ -87,7 +87,7 @@ Generate with:
 
     ./runGaussian_capacityTrends.sh
 
-![Model capacity scales with model and object parameters](github_images/capacityTrends_gaussian.png)
+<img alt="Model capacity scales with model and object parameters" src="github_images/capacityTrends_gaussian.png" width=400 />
 
 **Figure 7. (A-C)** Model capacity changes with model parameters
 (blue) and object parameters (orange). The network's capacity is
@@ -109,7 +109,7 @@ Generate with:
 
     ./runGaussian_capacityHeatmap.sh
 
-![A heatmap showing the capacity of the network while varying the feature pool size and location module size](github_images/capacityHeatmap_gaussian.png)
+<img alt="A heatmap showing the capacity of the network while varying the feature pool size and location module size" src="github_images/capacityHeatmap_gaussian.png" width=400 />
 
 **Figure 7. (D)** A heatmap
 showing the capacity of the network while varying the feature
@@ -123,7 +123,7 @@ Generate with:
 
     runGaussian_summary.sh
 
-![Summary chart showing recognition time and capacity while varying the model parameters](github_images/summary_gaussian.png)
+<img alt="Summary chart showing recognition time and capacity while varying the model parameters" src="github_images/summary_gaussian.png" width=400 />
 
 **Figure 8.** Summary chart showing recognition time and capacity
 while varying the model parameters. The top chart shows the
@@ -145,7 +145,7 @@ Generate with:
 
     runGaussian_featureDistributions.sh
 
-![Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects](github_images/featureDistributions_gaussian.png)
+<img alt="Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects" src="github_images/featureDistributions_gaussian.png" width=800 />
 
 **Figure S1.** Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects. The
 breaking point is much more consistent relative to the number of locations recalled by object features. In these charts we use a single
