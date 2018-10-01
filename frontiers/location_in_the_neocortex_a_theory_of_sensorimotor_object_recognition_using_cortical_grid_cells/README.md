@@ -19,14 +19,6 @@ There is an included Dockerfile that can be built. It will include the scripts i
 script commands listed below. The resulting charts will be saved to the
 `charts` directory (outside the container).
 
-## Generating Data and Charts
-
-The following sections provide instructions for both generating the data and
-creating the charts. Both data files and charts are also included in the
-repository and if you only want to make changes to the charts then you can
-look within each shell script to see the appopriate command to recreate the
-charts without regenerating the data (which may take a long time).
-
 ## Figures 5A, 5B, and 6A
 
 Generate with:
@@ -48,7 +40,7 @@ cells that predict the new sensation. Cell activity converges onto
 a sparse representation by Sensation 3 and remains sparse
 afterward.
 
-![Single trial cell activity for three modules](charts/narrowing_singleTrials_gaussian.pdf)
+<object data="charts/narrowing_singleTrials_gaussian.pdf" type="application/pdf"></object>
 
 **Figure 5 (B)** Cell activity in the same three modules as (A),
 shown for additional sensations and for two additional objects.
