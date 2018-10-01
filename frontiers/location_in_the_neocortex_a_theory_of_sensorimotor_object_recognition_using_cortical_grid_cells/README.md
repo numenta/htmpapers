@@ -28,7 +28,7 @@ Generate with:
 **Figure 5.** As the network recognizes an object, it converges onto
 a sparse activation.
 
-![Location layer cell activity](charts/narrowing_rhombus_gaussian.svg)
+![Location layer cell activity](github_images/narrowing_rhombus_gaussian.svg)
 
 **Figure 5. (A)** Location layer cell activity in three (out
 of ten) grid cell modules while recognizing a single object. The
@@ -40,7 +40,7 @@ cells that predict the new sensation. Cell activity converges onto
 a sparse representation by Sensation 3 and remains sparse
 afterward.
 
-<object data="charts/narrowing_singleTrials_gaussian.pdf" type="application/pdf"></object>
+![Cell activity in three grid modules](github_images/narrowing_singleTrials_gaussian.png)
 
 **Figure 5 (B)** Cell activity in the same three modules as (A),
 shown for additional sensations and for two additional objects.
@@ -55,7 +55,7 @@ activity shifts with each movement but remains unique to the
 object being sensed. (These simulations used a unique feature
 pool of size 40.)
 
-![Averaged activation density after each sensation](charts/narrowing_aggregated_gaussian.pdf)
+![Averaged activation density after each sensation](github_images/narrowing_aggregated_gaussian.png)
 
 **Figure 6. (A)** With multiple sensations, the location layer activity converges to a sparse representation. Using the same simulation
 from Figure 5, we show the activation density after each sensation, averaged across all objects and modules. With additional
@@ -69,7 +69,7 @@ Generate with:
 
     ./runGaussian_comparisonToIdeal.sh
 
-![Comparison of the network's performance relative to ideal and bag-of-features models](charts/comparisonToIdeal_gaussian.pdf)
+![Comparison of the network's performance relative to ideal and bag-of-features models](github_images/comparisonToIdeal_gaussian.png)
 
 **Figure 6. (B)** Comparison of this network’s performance with the ideal
 observer and a bag-of-features detector. Each model learned 100 objects from a
@@ -87,7 +87,7 @@ Generate with:
 
     ./runGaussian_capacityTrends.sh
 
-![Model capacity scales with model and object parameters](charts/capacityTrends_gaussian.pdf)
+![Model capacity scales with model and object parameters](github_images/capacityTrends_gaussian.png)
 
 **Figure 7. (A-C)** Model capacity changes with model parameters
 (blue) and object parameters (orange). The network's capacity is
@@ -109,7 +109,7 @@ Generate with:
 
     ./runGaussian_capacityHeatmap.sh
 
-![A heatmap showing the capacity of the network while varying the feature pool size and location module size](charts/capacityHeatmap_gaussian.pdf)
+![A heatmap showing the capacity of the network while varying the feature pool size and location module size](github_images/capacityHeatmap_gaussian.png)
 
 **Figure 7. (D)** A heatmap
 showing the capacity of the network while varying the feature
@@ -123,7 +123,7 @@ Generate with:
 
     runGaussian_summary.sh
 
-![Summary chart showing recognition time and capacity while varying the model parameters](charts/summary_gaussian.pdf)
+![Summary chart showing recognition time and capacity while varying the model parameters](github_images/summary_gaussian.png)
 
 **Figure 8.** Summary chart showing recognition time and capacity
 while varying the model parameters. The top chart shows the
@@ -145,7 +145,7 @@ Generate with:
 
     runGaussian_featureDistributions.sh
 
-![Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects](charts/featureDistributions_gaussian.pdf)
+![Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects](github_images/featureDistributions_gaussian.png)
 
 **Figure S1.** Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects. The
 breaking point is much more consistent relative to the number of locations recalled by object features. In these charts we use a single
