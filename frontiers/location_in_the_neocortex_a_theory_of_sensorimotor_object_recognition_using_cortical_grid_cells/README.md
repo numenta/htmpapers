@@ -40,7 +40,7 @@ cells that predict the new sensation. Cell activity converges onto
 a sparse representation by Sensation 3 and remains sparse
 afterward.
 
-![Cell activity in three grid modules](github_images/narrowing_singleTrials_gaussian.png)
+![Cell activity in three grid modules](github_images/narrowing_singleTrials_gaussian.png | width=400)
 
 **Figure 5 (B)** Cell activity in the same three modules as (A),
 shown for additional sensations and for two additional objects.
