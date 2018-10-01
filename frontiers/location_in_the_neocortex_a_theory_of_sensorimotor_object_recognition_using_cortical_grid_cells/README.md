@@ -19,16 +19,26 @@ There is an included Dockerfile that can be built. It will include the scripts i
 script commands listed below. The resulting charts will be saved to the
 `charts` directory (outside the container).
 
+## Generating Data and Charts
+
+The following sections provide instructions for both generating the data and
+creating the charts. Both data files and charts are also included in the
+repository and if you only want to make changes to the charts then you can
+look within each shell script to see the appopriate command to recreate the
+charts without regenerating the data (which may take a long time).
+
 ## Figures 5A, 5B, and 6A
 
 Generate with:
 
     ./runGaussian_narrowing.sh
 
-TODO: Show image(s)
-
 **Figure 5.** As the network recognizes an object, it converges onto
-a sparse activation. **(A)** Location layer cell activity in three (out
+a sparse activation.
+
+![Location layer cell activity](charts/narrowing_rhombus_gaussian.svg)
+
+**Figure 5. (A)** Location layer cell activity in three (out
 of ten) grid cell modules while recognizing a single object. The
 bumps of activity are shown in color; red indicates a high firing
 rate. The location representation, shown as darkened circles,
@@ -36,7 +46,11 @@ consists of cells that are sufficiently active. Each movement
 shifts the activity and each sensation narrows the activity to the
 cells that predict the new sensation. Cell activity converges onto
 a sparse representation by Sensation 3 and remains sparse
-afterward. **(B)** Cell activity in the same three modules as (A),
+afterward.
+
+![Single trial cell activity for three modules](charts/narrowing_singleTrials_gaussian.pdf)
+
+**Figure 5 (B)** Cell activity in the same three modules as (A),
 shown for additional sensations and for two additional objects.
 Each module has 100 cells. The black lines indicate that the cell
 is active during the indicated sensation. After the first sensation,
@@ -49,7 +63,7 @@ activity shifts with each movement but remains unique to the
 object being sensed. (These simulations used a unique feature
 pool of size 40.)
 
-TODO: Show image
+![Averaged activation density after each sensation](charts/narrowing_aggregated_gaussian.pdf)
 
 **Figure 6. (A)** With multiple sensations, the location layer activity converges to a sparse representation. Using the same simulation
 from Figure 5, we show the activation density after each sensation, averaged across all objects and modules. With additional
@@ -63,7 +77,7 @@ Generate with:
 
     ./runGaussian_comparisonToIdeal.sh
 
-TODO: Show image
+![Comparison of the network's performance relative to ideal and bag-of-features models](charts/comparisonToIdeal_gaussian.pdf)
 
 **Figure 6. (B)** Comparison of this network’s performance with the ideal
 observer and a bag-of-features detector. Each model learned 100 objects from a
@@ -81,7 +95,7 @@ Generate with:
 
     ./runGaussian_capacityTrends.sh
 
-TODO: Show image
+![Model capacity scales with model and object parameters](charts/capacityTrends_gaussian.pdf)
 
 **Figure 7. (A-C)** Model capacity changes with model parameters
 (blue) and object parameters (orange). The network's capacity is
@@ -103,7 +117,7 @@ Generate with:
 
     ./runGaussian_capacityHeatmap.sh
 
-TODO: Show image
+![A heatmap showing the capacity of the network while varying the feature pool size and location module size](charts/capacityHeatmap_gaussian.pdf)
 
 **Figure 7. (D)** A heatmap
 showing the capacity of the network while varying the feature
@@ -117,7 +131,7 @@ Generate with:
 
     runGaussian_summary.sh
 
-TODO: Show image
+![Summary chart showing recognition time and capacity while varying the model parameters](charts/summary_gaussian.pdf)
 
 **Figure 8.** Summary chart showing recognition time and capacity
 while varying the model parameters. The top chart shows the
@@ -139,7 +153,7 @@ Generate with:
 
     runGaussian_featureDistributions.sh
 
-TODO: Show image
+![Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects](charts/featureDistributions_gaussian.pdf)
 
 **Figure S1.** Varying the object statistics, the model's breaking point varies significantly relative to number of learned objects. The
 breaking point is much more consistent relative to the number of locations recalled by object features. In these charts we use a single
