@@ -21,6 +21,10 @@ This paper describes an important component of HTM, the HTM spatial pooler, whic
 This paper discusses the requirements necessary for real-time anomaly detection in streaming data, and demonstrates how Numenta's online sequence memory algorithm, HTM, meets those requirements. It presents detailed results using the Numenta Anomaly Benchmark (NAB), the first open-source benchmark designed for testing real-time anomaly detection algorithms.
 > [Sources][4_src]
 
+### [Why Neurons Have Thousands of Synapses, A Theory of Sequence Memory in Neocortex][6]
+Foundational paper describing core HTM theory for sequence memory and its relationship to the neocortex. Written with a neuroscience perspective, the paper explains why neurons need so many synapses and how networks of neurons can form a powerful sequence learning mechanism.
+> [Sources][6_src]
+
 [1]: https://doi.org/10.3389/fncir.2017.00081
 [1_src]: frontiers/a_theory_of_how_columns_in_the_neocortex_enable_learning_the_structure_of_the_world
 [2]: https://www.frontiersin.org/articles/10.3389/fncom.2017.00111
@@ -31,3 +35,5 @@ This paper discusses the requirements necessary for real-time anomaly detection 
 [4_src]: neurocomputing/unsupervised_real_time_anomaly_detection_for_streaming_data
 [5]: https://doi.org/10.1101/436352
 [5_src]: biorxiv/location_in_the_neocortex_a_theory_of_sensorimotor_object_recognition_using_cortical_grid_cells
+[6]: http://journal.frontiersin.org/article/10.3389/fncir.2016.00023/full
+[6_src]: frontiers/why_neurons_have_thousands_of_synapses

@@ -1,5 +1,4 @@
-This directory contains Python scripts that test some specific aspects of
-temporal memory.
+# Why Neurons Have Thousands of Synapses, A Theory of Sequence Memory in Neocortex
 
 The script runs sequence simulations with artificial data. The input stream
 contains high-order sequences mixed with random elements. The maximum possible
