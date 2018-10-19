@@ -6,4 +6,5 @@ pandas==0.18.0
 plotly==2.0.7
 prettytable==0.7.2
 
-htmresearch
+nupic==1.0.5
+htmresearch==0.0.3
