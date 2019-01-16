@@ -81,30 +81,36 @@ def createChart(inFilename, outFilename, modulesYmax, label1Position,
   fig, (ax1, ax2, ax3) = plt.subplots(figsize=(3.25, 1.35), ncols=3,
                                       sharey=True, tight_layout = {"pad": 0})
 
+  percentiles = [5, 50, 95]
+
   #
   # NUMBER OF MODULES
   #
   cellsPerModule = 100
   numUniqueFeatures = 100
-  markers = ["o", "*"]
-  markerSizes = [2.0, 3.0]
-  for thresholds, marker, markerSize in zip([-1, 0], markers, markerSizes):
+  for thresholds in [-1, 0]:
     x = []
     y = []
+    errBelow = []
+    errAbove = []
     for numModules in moduleCounts:
       params = (numModules, cellsPerModule, thresholds, numUniqueFeatures)
-      if params in meanCapacityByParams:
+      if params in capacitiesByParams:
         x.append(numModules)
-        y.append(meanCapacityByParams[params])
 
-    ax1.plot(x, y, "{}-".format(marker), color="C0",
-             markersize=markerSize,
-             markevery=[i
-                        for i, numModules in enumerate(x)
-                        if codesAreUnique[(numModules,
-                                           cellsPerModule,
-                                           thresholds,
-                                           numUniqueFeatures)]])
+        p1, p2, p3 = np.percentile(capacitiesByParams[params], percentiles)
+        y.append(p2)
+        errBelow.append(p2 - p1)
+        errAbove.append(p3 - p2)
+
+    ax1.errorbar(x, y, yerr=[errBelow, errAbove], fmt="-", color="C0",
+                 capsize=2,
+                 markevery=[i
+                            for i, numModules in enumerate(x)
+                            if codesAreUnique[(numModules,
+                                               cellsPerModule,
+                                               thresholds,
+                                               numUniqueFeatures)]])
 
     ax1.plot(x, y, "x", markersize=4, markeredgewidth=2, color="red",
              markevery=[i
@@ -137,12 +143,22 @@ def createChart(inFilename, outFilename, modulesYmax, label1Position,
   numModules = 10
   thresholds = -1
   numUniqueFeatures = 100
-  ax2.plot(allCellCounts, [meanCapacityByParams[(numModules,
-                                                 cellsPerModule,
-                                                 thresholds,
-                                                 numUniqueFeatures)]
-                           for cellsPerModule in allCellCounts],
-           "o-", color="C0", markersize=2.0)
+
+  x = []
+  y = []
+  errBelow = []
+  errAbove = []
+
+  for cellsPerModule in allCellCounts:
+    params = (numModules, cellsPerModule, thresholds, numUniqueFeatures)
+    p1, p2, p3 = np.percentile(capacitiesByParams[params], percentiles)
+
+    x.append(cellsPerModule)
+    y.append(p2)
+    errBelow.append(p2 - p1)
+    errAbove.append(p3 - p2)
+
+  ax2.errorbar(x, y, yerr=[errBelow, errAbove], fmt="-", color="C0", capsize=2)
 
   ax2.set_xlabel("Cells Per\nModule")
 
@@ -158,12 +174,25 @@ def createChart(inFilename, outFilename, modulesYmax, label1Position,
   numModules = 10
   cellsPerModule = 100
   thresholds = -1
-  ax3.plot(allFeatureCounts, [meanCapacityByParams[(numModules,
-                                                    cellsPerModule,
-                                                    thresholds,
-                                                    numUniqueFeatures)]
-                              for numUniqueFeatures in allFeatureCounts],
-           "o-", color="C1", markersize=2.0)
+
+  x = []
+  y = []
+  errBelow = []
+  errAbove = []
+
+  for numUniqueFeatures in allFeatureCounts:
+    params = (numModules, cellsPerModule, thresholds, numUniqueFeatures)
+    p1, p2, p3 = np.percentile(capacitiesByParams[params], percentiles)
+
+    x.append(numUniqueFeatures)
+    y.append(p2)
+    errBelow.append(p2 - p1)
+    errAbove.append(p3 - p2)
+
+  print [errBelow, errAbove]
+
+  ax3.errorbar(x, y, yerr=[errBelow, errAbove], fmt="o-", color="C1",
+               markersize=2.0, capsize=2)
 
   ax3.set_xlabel("Number of\nUnique Features")
   # ax3.set_xlim(0, ax3.get_xlim()[1])

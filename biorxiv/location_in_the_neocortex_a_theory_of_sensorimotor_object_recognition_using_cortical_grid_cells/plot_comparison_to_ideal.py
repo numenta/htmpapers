@@ -33,82 +33,79 @@ CWD = os.path.dirname(os.path.realpath(__file__))
 CHART_DIR = os.path.join(CWD, "charts")
 
 
+def getCumulativeAccuracy(convergenceFrequencies):
+  tot = float(sum(convergenceFrequencies.values()))
+
+  results = []
+
+  cum = 0.0
+  for step in xrange(1, 41):
+    cum += convergenceFrequencies.get(str(step), 0)
+    results.append(cum / tot)
+
+  return results
+
+
 def createChart(inFilename, outFilename, locationModuleWidths, legendPosition):
 
   numSteps = 12
 
-  resultsByParams = defaultdict(lambda: defaultdict(list))
+  resultsByParams = defaultdict(list)
 
   with open(inFilename, "r") as f:
     experiments = json.load(f)
 
   for exp in experiments:
     locationModuleWidth = exp[0]["locationModuleWidth"]
-    cum = 0
-    for i in xrange(40):
-      step = i + 1
-      count = exp[1]["convergence"].get(str(step), 0)
-      resultsByParams[locationModuleWidth][step].append(count)
-
-    count = exp[1]["convergence"].get("null", 0)
-    step = -1
-    resultsByParams[locationModuleWidth][step].append(count)
+    resultsByParams[locationModuleWidth].append(
+      getCumulativeAccuracy(exp[1]["convergence"]))
 
   with open("results/ideal.json", "r") as f:
-    idealResults = json.load(f)
+    idealResults = [getCumulativeAccuracy(trial)
+                    for trial in json.load(f)]
 
   with open("results/bof.json", "r") as f:
-    bofResults = json.load(f)
+    bofResults = [getCumulativeAccuracy(trial)
+                  for trial in json.load(f)]
 
   plt.figure(figsize=(3.25, 2.5), tight_layout = {"pad": 0})
 
-  for yData, label, fmt in [(resultsByParams[locationModuleWidth],
-                             "{}x{} Cells Per Module".format(locationModuleWidth,
-                                                             locationModuleWidth),
-                             fmt)
-                            for locationModuleWidth, fmt in zip(locationModuleWidths,
-                                                                ["s-", "o-", "^-"])]:
-    x = [i+1 for i in xrange(numSteps)]
+  
+  data = (
+    [(idealResults, "Ideal Observer", "x--", 10, 1)]
+
+    +
+    [(resultsByParams[locationModuleWidth],
+      "{}x{} Cells Per Module".format(locationModuleWidth,
+                                      locationModuleWidth),
+      fmt,
+      None,
+      0)
+     for locationModuleWidth, fmt in zip(locationModuleWidths,
+                                         ["s-", "o-", "^-"])]
+
+    +
+    [(bofResults, "Bag of Features", "d--", None, -1)])
+
+  percentiles = [5, 50, 95]
+
+  for resultsByTrial, label, fmt, markersize, zorder in data:
+    x = []
     y = []
-    tot = float(sum([sum(counts)
-                     for counts in yData.values()]))
-    cum = 0.0
-    for step in x:
-      if step in yData:
-        counts = yData[step]
-      else:
-        print yData
-        counts = yData[str(step)]
-      cum += float(sum(counts))
-      y.append(cum / tot)
-    std = [np.std(yData[step]) for step in x]
-    yBelow = [yi - stdi for yi, stdi in zip(y, std)]
-    yAbove = [yi + stdi for yi, stdi in zip(y, std)]
+    errBelow = []
+    errAbove = []
 
-    plt.plot(
-        x, y, fmt, label=label,
-    )
-    #plt.fill_between(x, yBelow, yAbove, alpha=0.3)
+    resultsByStep = zip(*resultsByTrial)
 
+    for step, results in zip(xrange(numSteps), resultsByStep):
+      x.append(step + 1)
+      p1, p2, p3 = np.percentile(results, percentiles)
+      y.append(p2)
+      errBelow.append(p2 - p1)
+      errAbove.append(p3 - p2)
 
-  for results, label, fmt, markersize in [(idealResults, "Ideal Observer", "x--", 10),
-                                          (bofResults, "Bag of Features", "d--", None)]:
-    x = [i+1 for i in xrange(numSteps)]
-    y = []
-    std = [np.std(results.get(str(steps), [0])) for steps in x]
-    tot = float(sum([sum(counts) for counts in results.values()]))
-    cum = 0.0
-    for steps in x:
-      counts = results.get(str(steps), [])
-      if len(counts) > 0:
-        cum += float(sum(counts))
-      y.append(cum / tot)
-    yBelow = [yi - stdi for yi, stdi in zip(y, std)]
-    yAbove = [yi + stdi for yi, stdi in zip(y, std)]
-    plt.plot(
-        x, y, fmt, label=label, markersize=markersize
-    )
-    #plt.fill_between(x, yBelow, yAbove, alpha=0.3)
+    plt.errorbar(x, y, yerr=[errBelow, errAbove], fmt=fmt, label=label,
+                 capsize=2, markersize=markersize, zorder=zorder)
 
   # Formatting
   plt.xlabel("Number of Sensations")
@@ -116,11 +113,11 @@ def createChart(inFilename, outFilename, locationModuleWidths, legendPosition):
 
   plt.xticks([(i+1) for i in xrange(numSteps)])
 
-  # If there's any opacity, when we export a copy of this from Illustrator, it
-  # creates a PDF that isn't compatible with Word.
-  framealpha = 1.0
-  plt.legend(loc="center right", bbox_to_anchor=legendPosition,
-             framealpha=framealpha)
+  # Remove the errorbars from the legend.
+  handles, labels = plt.gca().get_legend_handles_labels()
+  handles = [h[0] for h in handles]
+
+  plt.legend(handles, labels, loc="center right", bbox_to_anchor=legendPosition)
 
   outFilePath = os.path.join(CHART_DIR, outFilename)
   print "Saving", outFilePath
@@ -137,7 +134,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--inFile", type=str, required=True)
   parser.add_argument("--outFile", type=str, required=True)
-  parser.add_argument("--locationModuleWidth", type=int, nargs=3,
+  parser.add_argument("--locationModuleWidth", type=int, nargs='+',
                       default=[17, 20, 40])
   parser.add_argument("--legendPosition", type=float, nargs=2, default=None)
   args = parser.parse_args()

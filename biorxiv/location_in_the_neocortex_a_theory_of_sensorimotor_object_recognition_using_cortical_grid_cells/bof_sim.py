@@ -66,16 +66,12 @@ def runTrial(objects):
 
 
 def runSim(numObjects, numFeatures, numTrials):
-  # Map from # sensations to list of number of objects per trial
-  results = collections.defaultdict(list)
+  # List of trials, each a map from recognition time to number of occurrences
+  results = []
 
   for _ in xrange(numTrials):
     objects = generateObjects(numObjects, numFeatures)
-    trialResults = runTrial(objects)
-    for steps, count in trialResults.iteritems():
-      results[steps].append(count)
-
-  results = dict(results)
+    results.append(runTrial(objects))
 
   with open("results/bof.json", "w") as f:
     json.dump(results, f)

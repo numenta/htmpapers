@@ -121,20 +121,21 @@ def runTrial(objects, startingSpots, numFeatures):
 
 
 def runSim(numObjects, numFeatures, numTrials):
-  # Map from # sensations to list of number of objects per trial
-  results = collections.defaultdict(list)
+  # List of trials, each a map from recognition time to number of occurrences
+  results = []
   for _ in xrange(numTrials):
     objects = generateObjects(numObjects, numFeatures)
     # Built map from a feature to all possible positions
     startingSpots = getStartingSpots(objects)
-    trialResults = runTrial(objects, startingSpots, numFeatures)
-    for steps, count in trialResults.iteritems():
-      results[steps].append(count)
+    results.append(runTrial(objects, startingSpots, numFeatures))
 
-  results = dict(results)
   print results
-  total = sum([sum(l) for l in results.values()])
-  average = float(sum([sum([k*v for v in l]) for k, l in results.iteritems()])) / float(total)
+
+  total = sum(sum(trial.values()) for trial in results)
+  average = (sum(numSteps*numOccurrences
+                 for trial in results
+                 for numSteps, numOccurrences in trial.iteritems()) /
+             float(total))
   print "average:", average
 
   with open("results/ideal.json", "w") as f:
