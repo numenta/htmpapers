@@ -71,6 +71,8 @@ def createCharts(inFilename, outFilename, squeezeLegend,
                                                       nrows=2, sharex=True,
                                                       tight_layout = {"pad": 0})
 
+  percentiles = [20, 50, 80]
+
   #
   # CAPACITY
   #
@@ -81,17 +83,23 @@ def createCharts(inFilename, outFilename, squeezeLegend,
   for moduleWidth, color in reversed(zip(moduleWidths, colors)):
     for numModules, marker, markerSize in zip(moduleCounts, markers, markerSizes):
       resultsByNumObjects = capacityResults[(moduleWidth, numModules)]
-      expResults = [(numObjects, sum(results) / len(results))
-                     for numObjects, results in resultsByNumObjects.iteritems()]
 
       x = []
       y = []
-      for i, j in sorted(expResults):
-        x.append(i)
-        y.append(j)
+      errBelow = []
+      errAbove = []
 
-      axCapacity.plot(
-        x, y, "{}-".format(marker), color=color, linewidth=1, markersize=markerSize
+      for numObjects, results in sorted(resultsByNumObjects.iteritems()):
+        p1, p2, p3 = np.percentile(results, percentiles)
+
+        x.append(numObjects)
+        y.append(p2)
+        errBelow.append(p2 - p1)
+        errAbove.append(p3 - p2)
+
+      axCapacity.errorbar(
+        x, y, yerr=[errBelow, errAbove], fmt="{}-".format(marker), color=color,
+        linewidth=1, markersize=markerSize, capsize=2
       )
 
   axCapacity.set_xlabel("Number of Learned Objects")

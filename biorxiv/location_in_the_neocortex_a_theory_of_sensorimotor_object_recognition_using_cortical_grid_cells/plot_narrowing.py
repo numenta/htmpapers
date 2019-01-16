@@ -111,61 +111,6 @@ def examplesChart(inFilename, outFilename, objectCount, objectNumbers,
   plt.savefig(filename)
 
 
-def aggregateChart(inFilename, outFilename, objectCounts, ylim):
-  if not os.path.exists(CHART_DIR):
-    os.makedirs(CHART_DIR)
-
-  markers = ["*", "x", "o", "P"]
-
-  plt.figure(figsize=(3.25, 2.5), tight_layout = {"pad": 0})
-
-  resultsByNumObjects = {}
-  with open(inFilename, "r") as f:
-    experiments = json.load(f)
-  for exp in experiments:
-    numObjects = exp[0]["numObjects"]
-    resultsByNumObjects[numObjects] = exp[1]["locationLayerTimelineByObject"]
-
-  for numObjects, marker in zip(objectCounts, markers):
-    results = resultsByNumObjects[numObjects]
-
-    timestepsByObject = [
-      timesteps
-      for k, timesteps in results.iteritems()]
-
-    numCells = 100
-    numSteps = 9
-
-    x = np.arange(1, numSteps + 1)
-    y = np.zeros((9), dtype="float")
-    for iTimestep, timestepByObject in enumerate(zip(*timestepsByObject)):
-      totalActive = 0
-      potentialActive = 0
-      for moduleStates in timestepByObject:
-        for moduleState in moduleStates:
-          totalActive += len(moduleState["activeCells"])
-          potentialActive += numCells
-
-      if iTimestep < numSteps:
-        y[iTimestep] = totalActive / float(potentialActive)
-
-    plt.plot(x, y, "{}-".format(marker), label="{} learned objects".format(numObjects))
-
-  plt.xlabel("Number of Sensations")
-  plt.ylabel("Mean Cell Activation Density")
-
-  plt.ylim(ylim)
-
-  # If there's any opacity, when we export a copy of this from Illustrator, it
-  # creates a PDF that isn't compatible with Word.
-  framealpha = 1.0
-  plt.legend(framealpha=framealpha)
-
-  filename = os.path.join(CHART_DIR, outFilename)
-  print "Saving", filename
-  plt.savefig(filename)
-
-
 if __name__ == "__main__":
   plt.rc("font",**{"family": "sans-serif",
                    "sans-serif": ["Arial"],
@@ -176,10 +121,8 @@ if __name__ == "__main__":
   parser.add_argument("--outFile1", type=str, required=True)
   parser.add_argument("--outFile2", type=str, required=True)
   parser.add_argument("--exampleObjectCount", type=int, default=100)
-  parser.add_argument("--aggregateObjectCounts", type=int, nargs="+", default=[50, 75, 100, 125])
   parser.add_argument("--exampleObjectNumbers", type=int, nargs="+", default=-1)
   parser.add_argument("--exampleModuleNumbers", type=int, nargs="+", default=range(3))
-  parser.add_argument("--aggregateYlim", type=float, nargs=2, default=(-0.05, 1.05))
   parser.add_argument("--scrambleCells", action="store_true")
   args = parser.parse_args()
 
