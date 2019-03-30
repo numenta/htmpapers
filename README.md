@@ -1,6 +1,10 @@
 # Numenta research papers code and data
 This repository contains reproducible code for selected Numenta papers. It is currently under construction and will eventually include the source code for all the scripts used in Numenta's papers.
 
+### [How Can We Be So Dense? The Benefits of Using Highly Sparse Representations][7]
+In this paper we discuss inherent benefits of high dimensional sparse representations. We focus on robustness and sensitivity to interference. These are central issues with today’s neural network systems where even small and large perturbations can cause dramatic changes to a network’s output.
+> [Sources][7_src]
+
 ### [Locations in the Neocortex: A Theory of Sensorimotor Object Recognition Using Cortical Grid Cells][5]
 This paper provides an implementation for a location layer with grid-like modules that encode object-specific locations. This layer is incorpated into a network with an input layer and simulations show how the model can learn many complex objects and later infer which learned object is being sensed.
 > [Sources][5_src]
@@ -37,3 +41,5 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [5_src]: biorxiv/location_in_the_neocortex_a_theory_of_sensorimotor_object_recognition_using_cortical_grid_cells
 [6]: http://journal.frontiersin.org/article/10.3389/fncir.2016.00023/full
 [6_src]: frontiers/why_neurons_have_thousands_of_synapses
+[7]: https://arxiv.org/abs/1903.11257
+[7_src]: arxiv/how_can_we_be_so_dense
