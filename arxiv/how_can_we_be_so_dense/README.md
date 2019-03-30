@@ -6,7 +6,7 @@ Most artificial networks today rely on dense representations, whereas biological
 
 ## Running experiments
 
-Below are instructions for reproducing all the charts and tables presented in the paper.
+Below are instructions for reproducing all the charts and tables presented in the paper. There might be small differences due to randomness.
 
 ### Prerequisites
 
@@ -19,12 +19,14 @@ python setup.py --user develop
 ``` 
 
 And the following script to download _Google Speech Commands Dataset_:
+
 ```
 cd projects/speech_commands/data
 ./download_speech_commands.sh
 ```
 
 Alternatively, you may use [docker][3] to run the experiments in a container:
+
 ```
 docker build -t htmpaper .
 docker run -it htmpaper /bin/bash
@@ -32,7 +34,7 @@ docker run -it htmpaper /bin/bash
 
 ### Training the models
 
-All experiments have a common script called `run_experiment.py` located in the root of each project used to train and test the models. Once the models are trained, you may use the other script in the specific project folder to generate the figures and data used in the paper.
+All experiments have a common script called `run_experiment.py` located in the root of each project used to train and test the models. Once the models are trained, you may use the other script in the specific project folder to generate the figures and data used in the paper. We recommend using GPU acceleration. Otherwise some of the training, particularly for Google Speech Commands, will take significantly longer.
 
 Use the following command to train all the models from the project folder:
 
@@ -45,23 +47,27 @@ Use `python run_experiment.py -h` for more options.
 ## Figures
 
 ### Figure 2: Match probability for sparse vectors 
-The probability of matches to random binary vectors (with a active bits) as a function of dimensionality, for various levels of sparsity. The y-axis is log-scale and the probability decreases exponentially with n.
+![Figure 2](figures/fig2.png)
+
+The probability of matches to random binary vectors (with a active bits) as a function of dimensionality, for various levels of sparsity. The probability decreases exponentially with n. Black circles denote the observed frequency of a match (based on a large number of trials).
 
 ```
 cd projects
 python plot_numerical_results.py
 ```
 
-![Figure 2](figures/fig2.png)
+### Figure 3: Matching sparse scalar vectors: effect of scale
+![Figure 3](figures/fig3.png)
 
-### Table 1: MNIST results for dense and sparse architectures
-We show classification accuracies and total noise scores (the total number of correct classification for all noise levels). Results are averaged over 10 random seeds, ± one standard deviation. CNN-1 and CNN-2 indicate one or two convolutional layers, respectively
+**Left**: The probability of matches to random scalar vectors (with a non-zero components) as a function of dimensionality, for various levels of sparsity. The probability of false matches decreases exponentially with _n_. Note that the probability for a dense vector, _a = n/2_ stays relatively high, and does not decrease with dimensionality. 
+**Right**: The impact of scale on vector matches with a fixed _n = 1000_. The larger the scaling discrepancy, the higher the probability of a false match
 
 ```
 cd projects
-python test_score_table.py -c mnist/experiments_paper.cfg
+python scalar_sdr.py
 ```
 
+### Table 1: MNIST results for dense and sparse architectures
 |      Network     |  Test score  |    Noise score    |
 |:-----------------|-------------:|------------------:|
 | Dense CNN-1      | 99.14 ± 0.03 |  74,569 ± 3,200   |
@@ -75,14 +81,14 @@ python test_score_table.py -c mnist/experiments_paper.cfg
 | Sparse CNN-2 W1  | 98.20 ± 0.19 | 100,322 ± 2,082   |
 | Sparse CNN-2 DSW | 98.92 ± 0.09 |  70,566 ± 2,857   |
 
-### Table 2: Classification on Google Speech Commands for a number of architectures
-We show test and noise scores, averaged over 10 random seeds, ± one standard deviation. Dr corresponds to different dropout levels
+We show classification accuracies and total noise scores (the total number of correct classification for all noise levels). Results are averaged over 10 random seeds, ± one standard deviation. CNN-1 and CNN-2 indicate one or two convolutional layers, respectively
 
 ```
 cd projects
-python test_score_table.py -c speech_commands/experiments_paper.cfg
+python test_score_table.py -c mnist/experiments_paper.cfg
 ```
 
+### Table 2: Classification on Google Speech Commands for a number of architectures
 |         Network      |  Test score  |  Noise score   |
 |:---------------------|-------------:|---------------:|
 | Dense CNN-2 (DR=0.0) | 96.37 ± 0.37 |   8,730 ± 471  |
@@ -90,28 +96,27 @@ python test_score_table.py -c speech_commands/experiments_paper.cfg
 | Sparse CNN-2         | 96.65 ± 0.21 |  11,233 ± 1013 |
 | Super-Sparse CNN-2   | 96.57 ± 0.16 |  10,752 ± 942  |
 
+We show test and noise scores, averaged over 10 random seeds, ± one standard deviation. Dr corresponds to different dropout levels
 
-### Figure 4: MNIST Results With Noise
-A. Example MNIST images with varying levels of noise. 
-B. Classification accuracy as a function of noise level.
+```
+cd projects
+python test_score_table.py -c speech_commands/experiments_paper.cfg
+```
+
+
+### Figure 5: MNIST Results With Noise
+![Figure 5](figures/fig5.png)
+
+**A**. Example MNIST images with varying levels of noise. 
+**B**. Classification accuracy as a function of noise level.
 
 ```
 cd projects/mnist
 python analyze_noise.py -c experiments_paper.cfg
 ```
 
-![Figure 4](figures/fig4.png)
-
 
 ### Table 3: Key parameters for each network. 
-L1F and L2F denote the number of filters at the corresponding CNN layer. L1,2,3 sparsity indicates k/n, the percentage of outputs that were enforced to be non-zero. 100% indicates a special case where we defaulted to traditional ReLU activations. Wt sparsity indicates the percentage of weights that were non-zero. All parameters are available in the source code.
-
-```
-cd projects
-python parameters_table.py -c mnist/experiments_paper.cfg 
-python parameters_table.py -c speech_commands/experiments_paper.cfg 
-```
-
 |   Network       |   L1 F | L1 Sparsity   |   L2 F | L2 Sparsity   |   L3 N | L3 Sparsity   | Wt Sparsity   |
 |:----------------|-------:|--------------:|-------:|--------------:|-------:|--------------:|--------------:|
 | **MNIST**       |        |               |        |               |        |               |               | 
@@ -130,6 +135,14 @@ python parameters_table.py -c speech_commands/experiments_paper.cfg
 | denseCNN2       |     64 | 100.0%        |     64 | 100.0%        |   1000 | 100.0%        | 100.0%        |
 | sparseCNN2      |     64 | 9.5%          |     64 | 12.5%         |   1000 | 10.0%         | 40.0%         |
 | SuperSparseCNN2 |     64 | 9.5%          |     64 | 12.5%         |   1500 | 6.7%          | 10.0%         |
+
+L1F and L2F denote the number of filters at the corresponding CNN layer. L1,2,3 sparsity indicates k/n, the percentage of outputs that were enforced to be non-zero. 100% indicates a special case where we defaulted to traditional ReLU activations. Wt sparsity indicates the percentage of weights that were non-zero. All parameters are available in the source code.
+
+```
+cd projects
+python parameters_table.py -c mnist/experiments_paper.cfg 
+python parameters_table.py -c speech_commands/experiments_paper.cfg 
+```
 
 --------------------------------------------------------------------------------
 ## Directory structure:
@@ -177,6 +190,7 @@ python parameters_table.py -c speech_commands/experiments_paper.cfg
 
   - Other
     - `plot_numerical_results.py`: Plot SDR numeric properties
+    - `scalar_sdr.py`: Code used to compute the probability of matching scalar sparse vectors
     - `test_score_table.py` : Prints test and noise scores table
     - `parameters_table.py` : Prints key parameters table
 ----
