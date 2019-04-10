@@ -6,6 +6,8 @@ Most artificial networks today rely on dense representations, whereas biological
 
 ## Running experiments
 
+This repository contains versioned code used to replicate the experiments in the paper. For the latest pytorch code for using the code in your own projects check the [nupic.torch][4] repository.
+
 Below are instructions for reproducing all the charts and tables presented in the paper. There might be small differences due to randomness.
 
 ### Prerequisites
@@ -199,4 +201,4 @@ python parameters_table.py -c speech_commands/experiments_paper.cfg
 [1]: https://arxiv.org/abs/1903.11257
 [2]: https://www.python.org/downloads
 [3]: https://www.docker.com/
-
+[4]: https://github.com/numenta/nupic.torch
