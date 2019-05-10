@@ -37,8 +37,8 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [3_src]: https://github.com/numenta/NAB
 [4]: http://www.sciencedirect.com/science/article/pii/S0925231217309864
 [4_src]: neurocomputing/unsupervised_real_time_anomaly_detection_for_streaming_data
-[5]: https://doi.org/10.1101/436352
-[5_src]: biorxiv/location_in_the_neocortex_a_theory_of_sensorimotor_object_recognition_using_cortical_grid_cells
+[5]: https://doi.org/10.3389/fncir.2019.00022
+[5_src]: frontiers/location_in_the_neocortex_a_theory_of_sensorimotor_object_recognition_using_cortical_grid_cells
 [6]: http://journal.frontiersin.org/article/10.3389/fncir.2016.00023/full
 [6_src]: frontiers/why_neurons_have_thousands_of_synapses
 [7]: https://arxiv.org/abs/1903.11257
