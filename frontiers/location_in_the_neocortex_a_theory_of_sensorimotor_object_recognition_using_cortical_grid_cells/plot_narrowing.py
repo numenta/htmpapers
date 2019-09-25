@@ -133,5 +133,3 @@ if __name__ == "__main__":
   examplesChart(args.inFile, args.outFile1, args.exampleObjectCount,
                 exampleObjectNumbers, args.exampleModuleNumbers,
                 args.scrambleCells)
-  aggregateChart(args.inFile, args.outFile2, args.aggregateObjectCounts,
-                 args.aggregateYlim)
