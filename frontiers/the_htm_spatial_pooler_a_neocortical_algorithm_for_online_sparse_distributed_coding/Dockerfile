@@ -22,8 +22,9 @@ FROM python:2.7.14
 
 # Install dependencies
 COPY requirements.txt /home/
-RUN pip install -r /home/requirements.txt
-
+RUN pip install numpy==1.11.3 && \
+    pip install gensim==3.0.0 && \
+    pip install -r /home/requirements.txt
 # Copy context into container file system
 COPY . /home/
 WORKDIR /home/
@@ -35,4 +36,4 @@ ENV MPLBACKEND=Agg
 VOLUME /home/results/ 
 VOLUME /home/figures/ 
 
-ENTRYPOINT ["python", "train_sp.py"]
+CMD ["python", "train_sp.py"]
