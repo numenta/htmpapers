@@ -172,7 +172,7 @@ def _getArgs():
 
   parser.add_option("--spatialImp",
                     type=str,
-                    default="cpp",
+                    default="py",
                     dest="spatialImp",
                     help="spatial pooler implementations: py, c++, or "
                          "monitored_sp")
