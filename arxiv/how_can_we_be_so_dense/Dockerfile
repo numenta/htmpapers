@@ -18,7 +18,7 @@
 #
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
-FROM python:2.7
+FROM python:2.7.14
 
 # Install python dependencies
 COPY requirements.txt /work/requirements.txt
