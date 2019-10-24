@@ -18,7 +18,7 @@
 #
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
-FROM python:2.7.14
+FROM numenta/nupic:1.0.5
 
 # Install dependencies
 COPY requirements.txt /home/
