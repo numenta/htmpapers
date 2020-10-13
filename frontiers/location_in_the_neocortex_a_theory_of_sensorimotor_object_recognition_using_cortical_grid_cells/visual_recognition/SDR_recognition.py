@@ -60,6 +60,7 @@ from copy import copy
 import time
 import json
 
+
 import numpy as np
 
 from htmresearch.frameworks.location.object_generation import generateObjects
@@ -97,7 +98,8 @@ cellCoordinateOffsets = tuple([i * (0.998 / (numOffsets-1)) + 0.001
                                for i in xrange(numOffsets)])
 
 
-def basic_object_learning(locationModuleWidth,
+def basic_object_learning(train_only_bool,
+                 locationModuleWidth,
                  bumpType,
                  cellCoordinateOffsets,
                  initialIncrement,
@@ -128,7 +130,7 @@ def basic_object_learning(locationModuleWidth,
   scale = 40.0
 
   if thresholds == -1:
-    thresholds = int(math.ceil(numModules * 0.6))
+    thresholds = int(math.ceil(numModules * 1.0))
   elif thresholds == 0:
     thresholds = numModules
   perModRange = float((90.0 if bumpType == "square" else 60.0) /
@@ -180,38 +182,47 @@ def basic_object_learning(locationModuleWidth,
 
   print "Testing", numObjects
 
-  if use_original_objects == True:
-    objects = generateObjects(numObjects, featuresPerObject, objectWidth,
-                              numFeatures, featureDistribution)
-
-  else:
-    features_dic, objects = generate_image_objects(numObjects, featuresPerObject, objectWidth,
-                              numFeatures, featureDistribution=None)
-
-  #print(objects)
-
   column = PIUNCorticalColumn(locationConfigs, L4Overrides=l4Overrides,
                               bumpType=bumpType)
 
 
   features = [str(i) for i in xrange(numFeatures)]
+
   if use_original_objects == True:
+    train_objects = generateObjects(numObjects, featuresPerObject, objectWidth,
+                              numFeatures, featureDistribution)
     exp = PIUNExperiment_original(column, featureNames=features,
+                     numActiveMinicolumns=10,
+                     noiseFactor=noiseFactor,
+                     moduleNoiseFactor=moduleNoiseFactor)
+
+  else:
+    train_features_dic, train_objects = generate_image_objects(numObjects, featuresPerObject, objectWidth,
+                              numFeatures, featureDistribution=None, training_bool=True, sanity_check_bool=sanity_check_bool)
+    
+    train_exp = PIUNExperiment(column, features_dic=train_features_dic,
                          numActiveMinicolumns=10,
                          noiseFactor=noiseFactor,
                          moduleNoiseFactor=moduleNoiseFactor)
 
-  else:
-    exp = PIUNExperiment(column, features_dic=features_dic,
-                         numActiveMinicolumns=10,
-                         noiseFactor=noiseFactor,
-                         moduleNoiseFactor=moduleNoiseFactor)
+    if train_only_bool == True:
+      test_features_dic, test_objects = train_features_dic, train_objects
+      test_exp = train_exp
+
+    elif train_only_bool == False:
+      print("Using seperate test daa-set to evaluate accuracy")
+      test_features_dic, test_objects = generate_image_objects(numObjects=100, featuresPerObject=featuresPerObject, objectWidth=objectWidth,
+                              numFeatures=5*5*100, featureDistribution=None, training_bool=False)
+      test_exp = PIUNExperiment(column, features_dic=test_features_dic,
+                     numActiveMinicolumns=10,
+                     noiseFactor=noiseFactor,
+                     moduleNoiseFactor=moduleNoiseFactor)
 
   currentLocsUnique = True #***
 
-  for objectDescription in objects:
+  for objectDescription in train_objects:
     #print(objectDescription)
-    objLocsUnique = exp.learnObject(objectDescription)
+    objLocsUnique = train_exp.learnObject(objectDescription)
     currentLocsUnique = currentLocsUnique and objLocsUnique
 
   numFailures = 0
@@ -228,52 +239,98 @@ def basic_object_learning(locationModuleWidth,
   #     traceHandle = trace(traceFileOut, exp, includeSynapses=False)
   #     print "Logging to", filename
 
-  for objectDescription in objects:
-    numSensationsToInference = exp.inferObjectWithRandomMovements(
-        objectDescription)
+  numIncorrect = 0
+  total_sensations = 0
+
+  # Over-write the features dictionary
+  #print(train_exp.features)
+  train_exp.features = test_features_dic
+  #print(train_exp.features)
+
+  objectImages = np.load("first_100_images.npy")
+  object_iter = 0
+  
+  for objectDescription in test_objects:
+    numSensationsToInference, incorrect = train_exp.inferObjectWithRandomMovements(
+        objectDescription,
+        objectImage=objectImages[object_iter],
+        trial_iter=ii)
+    object_iter += 1
     if numSensationsToInference is None:
       numFailures += 1
+      numIncorrect += incorrect
+    else:
+      print("numSensationsToInference:")
+      print(numSensationsToInference)
+      total_sensations += numSensationsToInference #Keep a running tally of sensations needed on 
+      # successful trials to calculate a mean number of sensations
 
   # finally:
   #   if useTrace:
   #     traceHandle.__exit__()
   #     traceFileOut.close()
 
-  if numFailures < numFailuresAllowed:
-    numObjects = currentNumObjects
-    accuracy = float(currentNumObjects - numFailures) / currentNumObjects
-    allLocationsAreUnique = currentLocsUnique
+  # if numFailures < numFailuresAllowed:
+  currentNumObjects = len(test_objects)
+  print("Number of test objects: " + str(currentNumObjects))
+  accuracy = 100* float(currentNumObjects - numFailures) / currentNumObjects
+  # print(numFailures)
+  # print(currentNumObjects)
+  # print(numIncorrect)
+  errors = 100 * numFailures / float(currentNumObjects)
+  false_converging = 100 * numIncorrect / float(currentNumObjects)
+  if (currentNumObjects - numFailures) > 0:
+    mean_sensations = total_sensations / float(currentNumObjects - numFailures) #Divide by number of successful sensations
+    print("Mean sensations:" + str(mean_sensations))
+  allLocationsAreUnique = currentLocsUnique
+
 
 
   result = {
     "numObjects": numObjects,
-    "accuracy": accuracy,
+    "accuracy" : accuracy,
+    "errors" : errors,
+    "false converging": false_converging,
     "allLocationsAreUnique": allLocationsAreUnique,
   }
 
   print result
   return result
 
-numObjects=5
+numObjects = 100 #Number of objects to train on 
+num_trials = 15
+train_only_bool=False
+sanity_check_bool = False
+
 use_original_objects = False
 
-basic_object_learning(locationModuleWidth=10,
-                 bumpType='square',
-                 cellCoordinateOffsets=cellCoordinateOffsets,
-                 initialIncrement=128,
-                 minAccuracy=0.9,
-                 capacityResolution=1,
-                 capacityPercentageResolution=-1,
-                 featuresPerObject=5*5,
-                 objectWidth=5,
-                 numObjects=numObjects,
-                 numFeatures=5*5*numObjects,
-                 featureDistribution="AllFeaturesEqual_Replacement",
-                 noiseFactor=0,
-                 moduleNoiseFactor=0,
-                 numModules=20,
-                 thresholds=-1,
-                 seed1=-1,
-                 seed2=-1,
-                 anchoringMethod="corners")
+all_results = {}
+for ii in range(num_trials):
+
+  all_results["trial_" + str(ii)] = basic_object_learning(
+                   train_only_bool=train_only_bool,
+                   locationModuleWidth=20,
+                   bumpType='square',
+                   cellCoordinateOffsets=cellCoordinateOffsets,
+                   initialIncrement=128,
+                   minAccuracy=0.9,
+                   capacityResolution=1,
+                   capacityPercentageResolution=-1,
+                   featuresPerObject=5*5,
+                   objectWidth=5,
+                   numObjects=numObjects,
+                   numFeatures=5*5*numObjects,
+                   featureDistribution="AllFeaturesEqual_Replacement",
+                   noiseFactor=0,
+                   moduleNoiseFactor=0,
+                   numModules=40,
+                   thresholds=-1,
+                   seed1=-1,
+                   seed2=-1,
+                   anchoringMethod="corners")
+
+  print(all_results)
+  with open('all_results.json', 'w') as outfile:
+      json.dump(all_results, outfile)
+
 

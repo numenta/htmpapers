@@ -30,6 +30,8 @@ import random
 from collections import defaultdict
 
 import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
 
 from htmresearch.algorithms.apical_tiebreak_temporal_memory import (
   ApicalTiebreakPairMemory)
@@ -159,7 +161,7 @@ class PIUNCorticalColumn(object):
     """
     self.bumpType = bumpType
 
-    L4cellCount = 150*16 #originally 150*16
+    L4cellCount = 2048*16 #originally 150*16
     if bumpType == "gaussian":
       self.L6aModules = [
         createRatModuleFromCellCount(
@@ -182,7 +184,7 @@ class PIUNCorticalColumn(object):
       raise ValueError("Invalid bumpType", bumpType)
 
     L4Params = {
-      "columnCount": 150, #originally 150
+      "columnCount": 2048, #originally 150
       "cellsPerColumn": 16, #originally 16
       "basalInputSize": sum(module.numberOfCells()
                             for module in self.L6aModules)
@@ -342,7 +344,7 @@ class PIUNExperiment(object):
 
   def __init__(self, column,
                features_dic=None,
-               numActiveMinicolumns=15, #Originally 15
+               numActiveMinicolumns=32, #Originally 15
                noiseFactor = 0,
                moduleNoiseFactor = 0):
     """
@@ -475,6 +477,8 @@ class PIUNExperiment(object):
 
   def inferObjectWithRandomMovements(self,
                                      objectDescription,
+                                     objectImage,
+                                     trial_iter,
                                      numSensations=None,
                                      randomLocation=False,
                                      checkFalseConvergence=True):
@@ -506,6 +510,8 @@ class PIUNExperiment(object):
     inferred = False
     inferredStep = None
     prevTouchSequence = None
+    incorrect = 0 #Track if the non-recognition was due to convergance to an incorrect 
+    # representation as opposed to never converging
 
     for _ in xrange(self.maxTraversals):
       # Choose touch sequence.
@@ -523,9 +529,12 @@ class PIUNExperiment(object):
       for iFeature in touchSequence:
         currentStep += 1
         feature = objectDescription["features"][iFeature]
+        # print(feature)
         self._move(feature, randomLocation=randomLocation)
 
         featureSDR = self.features[feature["name"]]
+        # print(featureSDR)
+
         self._sense(featureSDR, learn=False, waitForSettle=False)
 
         if not inferred:
@@ -536,39 +545,120 @@ class PIUNExperiment(object):
           # are correct, it implies that the input layer's representation is
           # classifiable -- the location layer just correctly classified it.
           representation = self.column.getSensoryAssociatedLocationRepresentation()
-          print("\n\n\n Object name:")
-          print(objectDescription["name"])
-          print("iFeature:")
-          print(iFeature)
-          print("All location reps")
-          print(self.locationRepresentations)
-          print("Dic look-up")
-          print(self.locationRepresentations[("non_exit", 0)]) 
-          print(len(self.locationRepresentations[("non_exit", 0)]))
-          print("Location rep")
-          print(self.locationRepresentations[
-              (objectDescription["name"], iFeature)])
-          name_iter = objectDescription["name"] + '_' + str(0)
-          while len(self.locationRepresentations[(name_iter, 0)])
-          target_representations = set(np.concatenate(
-            self.locationRepresentations[
-              (objectDescription["name"], iFeature)]))
-          print("Representation set:")
-          print(set(representation))
-          print("Target set:")
+
+          # print(representation)
+          # print("\n\n\n Object name:")
+          # print(objectDescription["name"])
+          # print("iFeature:")
+          # print(iFeature)
+          # print("All location reps")
+          # print(self.locationRepresentations)
+          # print("Dic look-up")
+          # print(self.locationRepresentations[("non_exit", 0)]) 
+          # print(len(self.locationRepresentations[("non_exit", 0)]))
+          # print("Location rep")
+          # print(self.locationRepresentations[
+          #     (objectDescription["name"], iFeature)])
+
+          name_iter = 0
+          target_representations_temp = np.array([])
+
+          # print("\nNames:")
+          # print(objectDescription["name"])
+          # print(objectDescription["name"][0] + '_' + str(name_iter))
+
+          # print("\nLengths of features:")
+          # print(len(self.locationRepresentations[(objectDescription["name"], 0)]))
+          # print(len(self.locationRepresentations[(objectDescription["name"][0] + '_' + str(name_iter), 0)]))
+
+          #Iterate through all the objects that share the same base-class as the current object
+          # print("\n\n\n")
+          # print(objectDescription["name"])
+          # print(iFeature)
+          # print(self.locationRepresentations)
+          # print(self.locationRepresentations[
+          #     (objectDescription["name"], iFeature)])
+          # print(np.shape(self.locationRepresentations))
+          # exit()
+
+
+          # #Target representation for general classification
+          print("Performing general classification")
+          while len(self.locationRepresentations[(str(0) + '_' + str(name_iter), 0)]) > 0: #Note only the first part of the object name (it's base class) is used
+
+            # print("Current object for location reps:")
+            # print(objectDescription["name"][0] + '_' + str(name_iter))
+            #Append their target representations, such that the current object is correctly classified as long as it 
+            # matchs *a* example of that same object class
+            # print(objectDescription["name"][0] + 
+            #   '_' + str(name_iter))
+            # print(self.locationRepresentations[(objectDescription["name"][0] + 
+            #   '_' + str(name_iter), iFeature)])
+
+            target_representations_temp = np.concatenate((target_representations_temp, np.concatenate(self.locationRepresentations[(objectDescription["name"][0] + 
+              '_' + str(name_iter), iFeature)])))
+            name_iter += 1
+
+          target_representations = set(target_representations_temp)
           print(target_representations)
+          #print(len(target_representations))
+          if (len(target_representations) == 0):
+              print("No location representations to enable inference!")
+              return None, incorrect
+
+
+          # print(objectDescription["name"])
+          # print(iFeature)
+
+          # # Target representation for specific classification
+          # print("Performing specific-digit classification")
+          # if (len(self.locationRepresentations[(objectDescription["name"], iFeature)]) == 0):
+          #   print("No matching ID, using the first learned example")
+          #   target_representations = set(np.concatenate(
+          #     self.locationRepresentations[
+          #       (objectDescription["name"][0] + '_0', iFeature)]))
+              
+          # else:
+          #   target_representations = set(np.concatenate(
+          #     self.locationRepresentations[
+          #       (objectDescription["name"], iFeature)]))
+
+
+
+          # # Control using a single target representation for all 
+          # print("Using control set-up")
+          # target_representations = set(np.concatenate(
+          #     self.locationRepresentations[
+          #       (objectDescription["0_0"], iFeature)]))
+
+
+
+
+          # print(target_representations)
+
+          # print("Representation set:")
+          # print((set(representation)))
+          # print("Target set:")
+          # print((target_representations))
+
 
           inferred = (set(representation) <= target_representations)
           if inferred:
             print("Correctly inferred!")
             inferredStep = currentStep
             print("Ground truth label: " + objectDescription["name"])
-            print("Target set size : " + str(len(target_representations)))
+            # print(np.shape(objectImage))
+            # plt.imsave('correctly_classified/trial_' + str(trial_iter) + '_' + objectDescription["name"] + '.png', objectImage)
+
+            if len(set(representation)) > 20:
+              print("\n *** Large representation set on inferred! ***")
+
 
           if not inferred and tuple(representation) in self.representationSet:
             # We have converged to an incorrect representation - declare failure.
             print("Converged to an incorrect representation!")
-            return None
+            incorrect = 1
+            return None, incorrect
 
         finished = ((inferred and numSensations is None) or
                     (numSensations is not None and currentStep == numSensations))
@@ -584,7 +674,7 @@ class PIUNExperiment(object):
     for monitor in self.monitors.values():
       monitor.afterInferObject(objectDescription, inferredStep)
 
-    return inferredStep
+    return inferredStep, incorrect
 
 
   def _move(self, feature, randomLocation = False, useNoise = True):

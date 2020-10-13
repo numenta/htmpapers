@@ -27,7 +27,7 @@ of unions of locations that are specific to objects.
 import numpy as np
 
 def generate_image_objects(numObjects, featuresPerObject, objectWidth,
-                            numFeatures, featureDistribution=None):
+                            numFeatures, featureDistribution=None, training_bool=True, sanity_check_bool=False):
 
 	data_set = 'mnist'
 
@@ -35,16 +35,42 @@ def generate_image_objects(numObjects, featuresPerObject, objectWidth,
 	assert(numFeatures==numObjects*objectWidth*objectWidth), "\nThe total number of features is inconsistent."
 
 	#Import the SDRs (e.g. for the first two exmamples in MNIST), along with their labels
-	training_data = np.load(data_set + '_SDRs_training.npy')
-	training_labels = np.load(data_set + '_labels_training.npy')
+	if training_bool == True:
+		training_data = np.load(data_set + '_SDRs_training.npy')
+		training_labels = np.load(data_set + '_labels_training.npy')
+	else:
+		print("Loading MNIST test-data-set")
+		training_data = np.load(data_set + '_SDRs_testing.npy')
+		training_labels = np.load(data_set + '_labels_testing.npy')
+
 
 	#print(np.shape(training_data))
 	#print(np.shape(training_labels))
-	training_data_samples = training_data[0:numObjects,:]
-	trianing_labels_samples = training_labels[0:numObjects]
+	# training_data_samples = training_data[0:numObjects,:]
+	# training_labels_samples = training_labels[0:numObjects]
+
+	training_data_samples = []
+	training_labels_samples = []
+
+	if sanity_check_bool == True:
+		training_data_samples = training_data[0:1,:]
+		training_labels_samples = training_labels[0:1]
+
+	else: 
+		for MNIST_iter in range(10):
+			indices = np.nonzero(training_labels == MNIST_iter)
+			#print(np.shape(indices))
+			#print(np.shape(training_labels[indices]))
+			#print(training_labels[indices][0:10])
+			#Get the first numObjects/10 of the digit
+			training_data_samples.extend(training_data[indices][0:numObjects/10])
+			training_labels_samples.extend(training_labels[indices][0:numObjects/10])
+
+	#print(training_data_samples)
+
 	# print(np.shape(training_data_samples))
 	# print(training_data_samples)
-	# print(trianing_labels_samples)
+	# print(training_labels_samples)
 
 
 	features_dic = {}
@@ -58,7 +84,19 @@ def generate_image_objects(numObjects, featuresPerObject, objectWidth,
 
 	unique_name = 0
 
-	for example_iter in range(len(trianing_labels_samples)):
+	#Keep track of how many exampels of particular MNIST digits have come up; used to name unique examples iteratively
+	example_counter = {'0':0,
+		'1':0,
+		'2':0,
+		'3':0,
+		'4':0,
+		'5':0,
+		'6':0,
+		'7':0,
+		'8':0,
+		'9':0}
+
+	for example_iter in range(len(training_labels_samples)):
 		#print(np.shape(training_data_samples[example_iter]))
 		example_temp = np.reshape(training_data_samples[example_iter], (64, 5, 5))
 		#print(np.shape(example_temp))
@@ -83,6 +121,7 @@ def generate_image_objects(numObjects, featuresPerObject, objectWidth,
 				left = width_one*height_iter
 
 				features_dic[feature_name] = indices
+				#print(indices)
 				example_features_list.append({
 					'width': width_one,
 					'top': top,
@@ -95,13 +134,13 @@ def generate_image_objects(numObjects, featuresPerObject, objectWidth,
 				# print(np.shape(feature_temp))
 				# print(np.sum(feature_temp)/np.shape(example_temp)[0])
 
-		objects_list.append({'features':example_features_list, 'name':str(trianing_labels_samples[example_iter]) + '_' + str(example_iter)})
-		#objects_list.append({'features':example_features_list, 'name':str(trianing_labels_samples[example_iter])})
-				#Give each unique SDR a feature 'name' (number's 0 through number of unique SDRs; may be safe to initially just assume the SDRs are unique)
+		objects_list.append({'features':example_features_list, 'name':str(training_labels_samples[example_iter]) + '_' + str(example_counter[str(training_labels_samples[example_iter])])})
+		example_counter[str(training_labels_samples[example_iter])] += 1
 
 	# print(objects_list)
 	# print('\n\n')
 	# print(objects_dic)
+	print(example_counter)
 
 	return features_dic, objects_list
 
