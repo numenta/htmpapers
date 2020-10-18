@@ -1,1 +1,0 @@
-{"trial_0": {"total_errors": 100.0, "numTestingObjects": 10, "allLocationsAreUnique": false, "mean_sensations": null, "wrong_labels": 0.0, "numTrainingObjects": 10, "never_converged": 100.0, "false_converging": 0.0, "accuracy": 0.0}}
