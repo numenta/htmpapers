@@ -255,7 +255,6 @@ class PIUNExperiment(object):
 
     #Load the set of features from the image-based data
     self.features = features_dic
-    print(self.features)
 
     # For example:
     # [{"name": "Object 1",
@@ -323,8 +322,6 @@ class PIUNExperiment(object):
       for iFeature, feature in enumerate(objectDescription["features"]):
         self._move(feature, randomLocation=randomLocation, useNoise=useNoise)
 
-        print(objectDescription["features"])
-        print(feature["name"])
         featureSDR = self.features[feature["name"]]
 
         self._sense(featureSDR, learn=True, waitForSettle=False)

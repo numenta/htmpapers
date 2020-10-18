@@ -192,6 +192,7 @@ def object_learning_and_inference(eval_on_training_data_bool,
       # successful trials to calculate a mean number of sensations
     print("Time to infer object : " + str(time.time() - start_infer))
 
+  mean_sensations = None
 
   print("Number of test objects: " + str(numTestingObjects))
   accuracy = 100* float(numTestingObjects - numFailures) / numTestingObjects
@@ -199,7 +200,8 @@ def object_learning_and_inference(eval_on_training_data_bool,
   false_converging = 100 * numIncorrect / float(numTestingObjects)
   wrong_labels = 100 * numWrongLabel / float(numTestingObjects)
   never_converged = 100 * numNeverConverged / float(numTestingObjects)
-  mean_sensations = total_sensations / float(numTestingObjects - numFailures) #Divide by number of successful sensations
+  if (numTestingObjects - numFailures) > 0:
+    mean_sensations = total_sensations / float(numTestingObjects - numFailures) #Divide by number of successful sensations
   allLocationsAreUnique = currentLocsUnique
 
 
@@ -224,7 +226,7 @@ def object_learning_and_inference(eval_on_training_data_bool,
 numTrainingObjects = 10
 numTestingObjects = 10
 num_trials = 1
-eval_on_training_data_bool=False
+eval_on_training_data_bool=True
 sanity_check = None # Options are 'one_class_training' and 'wrong_label_inference'
 data_set = 'mnist'
 

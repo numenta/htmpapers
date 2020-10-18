@@ -87,7 +87,6 @@ def generate_image_objects(data_set, numObjects, objectWidth, locationModuleWidt
 				left = width_one*height_iter
 
 				features_dic[str(feature_name)] = indices #Name each feature uniquely
-				feature_name += 1 
 
 				sample_features_list.append({
 					'width': width_one,
@@ -96,6 +95,8 @@ def generate_image_objects(data_set, numObjects, objectWidth, locationModuleWidt
 					'name': str(feature_name),
 					'left': left
 					})
+
+				feature_name += 1 
 
 		objects_list.append({'features':sample_features_list,
 			'name':str(label_samples[sample_iter]) + '_' +
