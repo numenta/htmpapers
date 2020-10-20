@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 
 def maxEntropy(n,k):
   """
-  The maximum enropy we could get with n units and k winners
+  The maximum entropy we could get with n units and k winners
   """
 
   s = float(k)/n
