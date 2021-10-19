@@ -1,0 +1,3 @@
+nupic.torch @ git+https://github.com/numenta/nupic.torch.git@master#egg=nupic.torch
+nupic.research @ git+https://github.com/numenta/nupic.research.git@master#egg=nupic.research
+
