@@ -20,7 +20,7 @@
 
 """
 This trains a simple supervised CNN that can be used to output SDR features
-derived from images such as MNIST or Fashion-MNIST; these can subsequently
+(i.e. sparse feature vectors) derived from images such as MNIST; these can subsequently
 be used by other classifiers including GridCellNet, or a decoder to reconstruct
 the images
 Several functions are based on the k-WTA sparse_cnn.ipynb example in
@@ -39,8 +39,9 @@ from torchvision import datasets, transforms
 
 from nupic.torch.modules import KWinners2d, rezero_weights, update_boost_strength
 
-torch.manual_seed(18)
-np.random.seed(18)
+seed_val = 1
+torch.manual_seed(seed_val)
+np.random.seed(seed_val)
 
 # Parameters
 TRAIN_NEW_NET = True  # To generate all the SDRs needed for down-stream use in other

@@ -29,8 +29,8 @@ import numpy as np
 
 def generate_image_objects(
         data_set, num_samples_per_class, objectWidth,  # noqa: N803
-        locationModuleWidth, data_set_section="SDR_classifiers_training",  # noqa: N803
-        sanity_check=None):
+        locationModuleWidth,  # noqa: N803
+        data_set_section="SDR_classifiers_training", block_split=None):
 
     print("Loading " + data_set_section + " data-set from " + data_set)
     input_data = np.load("training_and_testing_data/" + data_set + "_SDRs_"
@@ -44,9 +44,9 @@ def generate_image_objects(
     label_samples = []
     training_image_samples = []
 
-    if sanity_check == "one_class_training":
-        print("\nAs a sanity check, training using only a single class")
-        num_classes = 1
+    if block_split is not None:
+        print("\nOnly training on the first " + str(block_split) + " classes")
+        num_classes = block_split
     else:
         num_classes = 10
 
@@ -57,6 +57,9 @@ def generate_image_objects(
         input_data_samples.extend(input_data[indices][0: num_samples_per_class])
         label_samples.extend(labels[indices][0: num_samples_per_class])
         training_image_samples.extend(images[indices][0: num_samples_per_class])
+
+        assert (len(labels[indices][0: num_samples_per_class])
+                == num_samples_per_class), "Insufficient training examples for loading"
 
     features_dic = {}
     feature_name = 0
@@ -80,7 +83,8 @@ def generate_image_objects(
 
     for sample_iter in range(len(label_samples)):
 
-        sample_temp = np.reshape(input_data_samples[sample_iter], (128, 5, 5))
+        sample_temp = np.reshape(input_data_samples[sample_iter],
+                                 (128, objectWidth, objectWidth))
         sample_features_list = []
 
         for width_iter in range(objectWidth):
