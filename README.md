@@ -1,6 +1,10 @@
 # Numenta research papers code and data
 This repository contains reproducible code for selected Numenta papers. It is currently under construction and will eventually include the source code for all the scripts used in Numenta's papers.
 
+### [Grid Cell Path Integration For Movement-Based Visual Object Recognition][8]
+This paper demonstrates the implementation of a sensorimotor network that uses grid-cell computations to process a sequence of visual inputs, specifically a sequence of image patches from the MNIST dataset. The network is able to classify novel digits (as well as perform other tasks) in a way that is robust to the specific sequence over which the visual space is sampled, a challenging setting for typical machine learning approaches. The work builds on our previous paper, “Locations in the Neocortex."
+> [Sources][8_src]
+
 ### [How Can We Be So Dense? The Benefits of Using Highly Sparse Representations][7]
 In this paper we discuss inherent benefits of high dimensional sparse representations. We focus on robustness and sensitivity to interference. These are central issues with today’s neural network systems where even small and large perturbations can cause dramatic changes to a network’s output.
 > [Sources][7_src]
@@ -43,3 +47,5 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [6_src]: frontiers/why_neurons_have_thousands_of_synapses
 [7]: https://arxiv.org/abs/1903.11257
 [7_src]: arxiv/how_can_we_be_so_dense
+[8]: https://arxiv.org/abs/<PENDING>
+[8_src]: bmvc/grid_cell_path_integration_for_movement_based_visual_object_recognition
