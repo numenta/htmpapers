@@ -31,8 +31,22 @@ from nupic.research.frameworks.dendrites import (
     BiasingDendriticLayer,
     GatingDendriticLayer,
 )
+from nupic.research.frameworks.dendrites.dendrite_cl_experiment import (
+    DendriteContinualLearningExperiment,
+)
+from nupic.research.frameworks.dendrites.mixins import EvalPerTask
+from nupic.research.frameworks.vernon import mixins
 
-from .centroid import CENTROID_10, CentroidExperimentEvalPerTask
+from .centroid import CENTROID_10
+
+
+class CentroidExperimentEvalPerTask(EvalPerTask,
+                                    mixins.RezeroWeights,
+                                    mixins.CentroidContext,
+                                    mixins.PermutedMNISTTaskIndices,
+                                    DendriteContinualLearningExperiment):
+    pass
+
 
 CENTROID_10_EVAL_PER_TASK = deepcopy(CENTROID_10)
 CENTROID_10_EVAL_PER_TASK.update(
@@ -40,15 +54,18 @@ CENTROID_10_EVAL_PER_TASK.update(
     tasks_to_validate=list(range(10)),
 )
 
+
 CENTROID_10_DENDRITE_BIAS = deepcopy(CENTROID_10_EVAL_PER_TASK)
 CENTROID_10_DENDRITE_BIAS["model_args"].update(
     dendritic_layer_class=BiasingDendriticLayer
 )
 
+
 CENTROID_10_DENDRITE_GATE = deepcopy(CENTROID_10_EVAL_PER_TASK)
 CENTROID_10_DENDRITE_GATE["model_args"].update(
     dendritic_layer_class=GatingDendriticLayer
 )
+
 
 CENTROID_10_DENDRITE_ABSMAXGATE = deepcopy(CENTROID_10_EVAL_PER_TASK)
 CENTROID_10_DENDRITE_ABSMAXGATE["model_args"].update(
