@@ -47,5 +47,5 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [6_src]: frontiers/why_neurons_have_thousands_of_synapses
 [7]: https://arxiv.org/abs/1903.11257
 [7_src]: arxiv/how_can_we_be_so_dense
-[8]: arxiv/going_beyond_the_point_neuron
-[8_src]: arxiv/going_beyond_the_point_neuron
+[8]: biorxiv/going_beyond_the_point_neuron
+[8_src]: biorxiv/going_beyond_the_point_neuron
