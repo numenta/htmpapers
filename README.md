@@ -1,8 +1,12 @@
 # Numenta research papers code and data
 This repository contains reproducible code for selected Numenta papers. It is currently under construction and will eventually include the source code for all the scripts used in Numenta's papers.
 
-### [Grid Cell Path Integration For Movement-Based Visual Object Recognition][8]
+### [Grid Cell Path Integration For Movement-Based Visual Object Recognition][9]
 This paper demonstrates the implementation of a sensorimotor network that uses grid-cell computations to process a sequence of visual inputs, specifically a sequence of image patches from the MNIST dataset. The network is able to classify novel digits (as well as perform other tasks) in a way that is robust to the specific sequence over which the visual space is sampled, a challenging setting for typical machine learning approaches. The work builds on our previous paper, “Locations in the Neocortex."
+> [Sources][9_src]
+
+### [Going Beyond the Point Neuron: Active Dendrites and Sparse Representations for Continual Learning][8]
+In this paper we investigate how dendritic properties can add value to ANNs in the context of continual learning, an area where ANNs suffer from catastrophic forgetting 
 > [Sources][8_src]
 
 ### [How Can We Be So Dense? The Benefits of Using Highly Sparse Representations][7]
@@ -47,5 +51,7 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [6_src]: frontiers/why_neurons_have_thousands_of_synapses
 [7]: https://arxiv.org/abs/1903.11257
 [7_src]: arxiv/how_can_we_be_so_dense
-[8]: https://arxiv.org/abs/<PENDING>
-[8_src]: bmvc/grid_cell_path_integration_for_movement_based_visual_object_recognition
+[8]: https://www.biorxiv.org/content/10.1101/2021.10.25.465651v1
+[8_src]: biorxiv/going_beyond_the_point_neuron
+[9]: https://www.bmvc2021-virtualconference.com/conference/papers/paper_1506.html
+[9_src]: bmvc/grid_cell_path_integration_for_movement_based_visual_object_recognition

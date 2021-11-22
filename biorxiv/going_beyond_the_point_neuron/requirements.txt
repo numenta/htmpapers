@@ -1,0 +1,2 @@
+nupic.torch @ git+https://github.com/numenta/nupic.torch.git@0682f8e#egg=nupic.torch
+nupic.research[dendrites] @ git+https://github.com/numenta/nupic.research.git@567a584#egg=nupic.research
