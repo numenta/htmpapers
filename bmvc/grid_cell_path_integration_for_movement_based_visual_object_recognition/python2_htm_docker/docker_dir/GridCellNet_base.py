@@ -77,7 +77,7 @@ class PIUNCorticalColumnForVisualRecognition(PIUNCorticalColumn):
 
         l4_params = {
             "columnCount": 128,  # Note overriding below
-            "cellsPerColumn": 16,
+            "cellsPerColumn": 32,
             "basalInputSize": sum(module.numberOfCells()
                                   for module in self.L6aModules)
         }
@@ -113,7 +113,9 @@ class PIUNExperimentForVisualRecognition(PIUNExperiment):
     def __init__(self, column,
                  features_dic=None,
                  noiseFactor=0,  # noqa: N803
-                 moduleNoiseFactor=0):
+                 moduleNoiseFactor=0,
+                 num_grid_cells=40 * 50 * 50,
+                 num_classes=10):
         """
         @param column (PIUNColumn)
         A two-layer network.
@@ -124,6 +126,9 @@ class PIUNExperimentForVisualRecognition(PIUNExperiment):
         Overwrite the original initializer to enable loading image-based features
         """
         self.column = column
+
+        # Weights to learn associations between active locations and class labels
+        self.class_weights = np.zeros((num_grid_cells, num_classes))
 
         # Use these for classifying SDRs and for testing whether they're correct.
         # Allow storing multiple representations, in case the experiment learns
@@ -151,7 +156,6 @@ class PIUNExperimentForVisualRecognition(PIUNExperiment):
         self.locationOnObject = None
 
         self.maxSettlingTime = 10
-        self.maxTraversals = 1
 
         self.monitors = {}
         self.nextMonitorToken = 1
@@ -161,55 +165,82 @@ class PIUNExperimentForVisualRecognition(PIUNExperiment):
 
         self.representationSet = set()
 
-    def getClassFeatures(self,  # noqa: N802
-                         objectClass,  # noqa: N803
-                         featuresPerObject):
+    def learnObject(self,  # noqa: N802
+                    objectDescription,  # noqa: N803
+                    randomLocation=False,
+                    useNoise=False,
+                    noisyTrainingTime=1):
         """
-        For all the feature locations, get all of the location representations for a
-        given class (e.g. all examples of "9"s in MNIST, as opposed to particular
-        examples of a 9)
-
-        @param objectClass (str)
-        The target class, e.g. "2"
-
-        @param featuresPerObject (int)
-
-        @return class_targets (list)
-        Target representations for the given class
+        Train the network to recognize the specified object. Move the sensor to one of
+        its features and activate a random location representation in the location
+        layer. Move the sensor over the object, updating the location representation
+        through path integration. At each point on the object, form reciprocal
+        connections between the represention of the location and the representation
+        of the sensory input.
+        @param objectDescription (dict)
+        For example:
+        {"name": "Object 1",
+         "features": [{"top": 0, "left": 0, "width": 10, "height": 10, "name": "A"},
+                      {"top": 0, "left": 10, "width": 10, "height": 10, "name": "B"}]}
+        @return locationsAreUnique (bool)
+        True if this object was assigned a unique set of locations. False if a
+        location on this object has the same location representation as another
+        location somewhere else.
         """
-        class_targets = []
+        self.reset()
+        self.column.activateRandomLocation()
 
-        for i_feature in range(featuresPerObject):
+        locationsAreUnique = True  # noqa: N806
+        all_locations = []
 
-            name_iter = 0
-            target_representations_temp = np.array([])
+        if randomLocation or useNoise:
+            numIters = noisyTrainingTime  # noqa: N806
+        else:
+            numIters = 1  # noqa: N806
+        for _ in xrange(numIters):  # noqa: F821
+            for iFeature, feature in enumerate(  # noqa: N806
+                    objectDescription["features"]):
+                self._move(feature, randomLocation=randomLocation, useNoise=useNoise)
+                featureSDR = self.features[feature["name"]]  # noqa: N806
+                self._sense(featureSDR, learn=True, waitForSettle=False)  # noqa: N806
 
-            while len(self.locationRepresentations[(objectClass
-                                                   + "_" + str(name_iter), 0)]) > 0:
+                locationRepresentation = (  # noqa: N806
+                    self.column.getSensoryAssociatedLocationRepresentation())
+                self.locationRepresentations[(objectDescription["name"],
+                                              iFeature)].append(locationRepresentation)
+                self.inputRepresentations[(objectDescription["name"],
+                                          iFeature, feature["name"])] = (
+                                              self.column.L4.getWinnerCells())
 
-                target_representations_temp = np.concatenate(
-                    (target_representations_temp, np.concatenate(
-                        self.locationRepresentations[
-                            (objectClass + "_" + str(name_iter), i_feature)])))
+                locationTuple = tuple(locationRepresentation)  # noqa: N806
+                locationsAreUnique = (locationsAreUnique  # noqa: N806
+                                      and locationTuple not in self.representationSet)
 
-                name_iter += 1
+                # Track all the grid cells active over learning of an object
+                all_locations.extend(locationRepresentation)
 
-            class_targets.append(set(target_representations_temp))
+                self.representationSet.add(tuple(locationRepresentation))
 
-        return class_targets
+            # Update the weights associating location reps with class labels
+            unique_locations = list(set(all_locations))
 
-    def inferObjectWithRandomMovements(self,  # noqa: C901, N802
-                                       objectDescription,  # noqa: N803
-                                       objectImage,  # noqa: N803
-                                       all_class_targets,
-                                       cellsPerColumn,  # noqa: N803
-                                       trial_iter,
-                                       fixed_touch_sequence=None,
-                                       numSensations=None,
-                                       randomLocation=False):
+            # Index by grid-cells that were active and the true class (i.e.
+            # supervised signal)
+            self.class_weights[unique_locations,
+                               int(objectDescription["name"][0])] += 1
+
+        self.learnedObjects.append(objectDescription)
+
+        return locationsAreUnique
+
+    def recallObjectWithRandomMovements(self,  # noqa: C901, N802
+                                        objectDescription,  # noqa: N803
+                                        flip_bits=0):  # noqa: N803
         """
-        Attempt to recognize the specified object with the network. Moves
-        the sensor over the object until the object is recognized.
+        Attempt to recall the exact specified object (i.e. from the training data-set).
+        Moves the sensor over the object until the object is recognized.
+        NB this is essentially the same form of inference as used in the Lewis et
+        al 2019 model.
 
         @param objectDescription (dict)
         For example:
@@ -217,209 +248,384 @@ class PIUNExperimentForVisualRecognition(PIUNExperiment):
          "features": [{"top": 0, "left": 0, "width": 10, "height": 10, "name": "A"},
                       {"top": 0, "left": 10, "width": 10, "height": 10, "name": "B"}]}
 
-        @objectImage (Numpy array)
-        The current object's image
+        @param flip_bits (int)
+        Number of bits to flip in the binary feature input array; used to evaluate
+        the robustness of the system to sensory noise.
 
-        @all_class_targets (list)
-        Target representations for each class
-
-        @cellsPerColumn (int)
-
-        @trial_iter (int)
-
-        @param numSensations (int or None)
-        Set this to run the network for a fixed number of sensations. Otherwise this
-        method will run until the object is recognized or until maxTraversals is
-        reached.
-
-        @return inferredStep (int or None), incorrect (dic), prediction_sequence (list),
-        touchSequence (list)
+        @return inferredStep (int or None), incorrect (dic)
         """
         self.reset()
 
-        for monitor in self.monitors.values():
-            monitor.beforeInferObject(objectDescription)
-
-        currentStep = 0  # noqa: N806
-        finished = False
         inferred = False
-        inferredStep = None  # noqa: N806
-        prevTouchSequence = None  # noqa: N806
+        currentStep = 0  # noqa: N806
         incorrect = {"never_converged": 1, "false_convergence": 0}  # Track if the
         # non-recognition was due to convergance to an incorrect representation or
         # never converging
 
-        for _ in xrange(self.maxTraversals):  # noqa: F821
-            # Choose touch sequence.
-            while True:
-                touchSequence = range(len(objectDescription["features"]))  # noqa: N806
-                if fixed_touch_sequence is None:
-                    random.shuffle(touchSequence)
-                    print("\nPerforming inference using an arbitrary, unfixed"
-                          "sequense of touches:")
-                    print(touchSequence)
+        # Generate touch sequence.
+        touchSequence = range(len(objectDescription["features"]))  # noqa: N806
+        random.shuffle(touchSequence)
 
-                else:
-                    print("\nPerforming inference using a fixed random"
-                          "sequense of touches:")
-                    touchSequence = fixed_touch_sequence  # noqa: N806
-                    print(touchSequence)
+        for iFeature in touchSequence:  # noqa: N806
+            currentStep += 1
+            feature = objectDescription["features"][iFeature]
+            self._move(feature, randomLocation=False)
 
-                # Make sure the first touch will cause a movement.
-                if (prevTouchSequence is not None and touchSequence[0]
-                        == prevTouchSequence[-1]):
-                    continue
+            featureSDR = self.features[feature["name"]]  # noqa: N806
 
-                break
+            if flip_bits > 0:
 
-            sense_sequence = []  # contains a list of all the previous input SDRs
-            prediction_sequence = []  # contains a list of the current SDR prediction,
-            # as well as previously sensed input SDRs up until inference is successful
+                new_flipped_indices = random.sample(range(128), flip_bits)
+
+                for to_flip in new_flipped_indices:
+
+                    if to_flip in set(featureSDR):
+
+                        # Remove the index if currently present (i.e flip a 1 to 0)
+                        featureSDR = featureSDR[featureSDR != to_flip]  # noqa: N806
+
+                    else:
+
+                        featureSDR = np.append(featureSDR, to_flip)  # noqa: N806
+
+                featureSDR = np.sort(featureSDR)  # noqa: N806
+
+            self._sense(featureSDR, learn=False, waitForSettle=False)
+
+            if not inferred:
+                # Use the sensory-activated cells to detect whether the object has been
+                # recognized. If these sensory-activated cells are correct, it implies
+                # that the input layer's representation is classifiable -- the location
+                # layer just correctly classified it.
+                representation = \
+                    self.column.getSensoryAssociatedLocationRepresentation()
+
+                target_representations = set(np.concatenate(
+                    self.locationRepresentations[
+                        (objectDescription["name"], iFeature)]))
+
+                inferred = ((set(representation) <= target_representations)
+                            and (len(representation) > 0))
+
+                if inferred:
+                    print("Inferred!")
+                    incorrect = {"never_converged": 0, "false_convergence": 0}
+                    return currentStep, incorrect
+
+                if not inferred and tuple(representation) in self.representationSet:
+                    # We have converged to an incorrect representation
+                    # - declare failure.
+                    print("Converged to an incorrect representation!")
+                    incorrect = {"never_converged": 0, "false_convergence": 1}
+                    return None, incorrect
+
+        if incorrect["never_converged"]:
+            print("\nNever converged!")
+
+        return None, incorrect
+
+    def inferObjectWithRandomMovements(self,  # noqa: C901, N802
+                                       objectDescription,  # noqa: N803
+                                       objectImage,  # noqa: N803
+                                       cellsPerColumn,  # noqa: N803
+                                       class_threshold,
+                                       inputGridDimension,
+                                       fixed_touch_sequence=None,
+                                       false_motor_information=False,
+                                       visualize_predictions_bool=False):
+        """
+        Attempt to recognize the *class* of the specified object with the network.
+        Moves the sensor over the object until the object is recognized.
+
+        @param objectDescription (dict)
+        For example:
+        {"name": "Object 1",
+         "features": [{"top": 0, "left": 0, "width": 10, "height": 10, "name": "A"},
+                      {"top": 0, "left": 10, "width": 10, "height": 10, "name": "B"}]}
+
+        @param objectImage (Numpy array)
+        The current object's image
+
+        @param cellsPerColumn (int)
+        Used to determine predicted columns.
+
+        @param class_threshold (float)
+        Determines the relative activity threshold that needs to be exceeded for the
+        system to classify the input as a particular class. Between 0 and 1.
+
+        @param fixed_touch_sequence (list or None)
+        Use a random but fixed sequence when performing inference for every object.
+        Used to evaluate the sensitivity of classification to the touch sequence
+        employed across learning and inference.
+
+        @param false_motor_information (bool)
+        If True, provide movement information that does not correspond to the location
+        of sensory inputs during inference.
+
+        @param visualize_predictions_bool (bool)
+        If True, iteratively run through inference to generate predictions of points
+        that were not observed before the representation converged. The generated
+        predictions can later be used to visualize how the classifier predicts
+        unseen regions.
+
+        @return inferredStep (int or None), incorrect (dic),
+        prediction_sequence (list), touchSequence (list)
+        """
+        self.reset()
+
+        inferredStep = None  # noqa: N806
+        single_converged_step = None  # When the system representation has converged
+        # to the size of a single previously learned object
+        incorrect = {"never_converged": 1, "false_convergence": 0}  # Track if the
+        # non-recognition was due to convergance to an incorrect representation or
+        # never converging
+
+        # Choose touch sequence.
+        touchSequence = range(len(objectDescription["features"]))  # noqa: N806
+
+        if fixed_touch_sequence is None:
+            random.shuffle(touchSequence)
+            print("\nPerforming inference using an arbitrary, unfixed"
+                  " sequense of touches:")
+            print(touchSequence)
+
+        else:
+            print("\nPerforming inference using a fixed random"
+                  " sequense of touches:")
+            touchSequence = fixed_touch_sequence  # noqa: N806
+            print(touchSequence)
+
+        # Touch sequence for motor input that *does not* align with sensed features
+        false_touchSequence = range(len(objectDescription["features"]))  # noqa: N806
+        # Only shuffle when actually using in order to preserve random seed behaviour
+        if false_motor_information:
+            random.shuffle(false_touchSequence)
+
+        sense_sequence = []  # Contains a list of all the previous input SDRs and
+        # (following convergence) predictions
+        prediction_sequence = []  # Contains a list of lists of the previously sensed
+        # and predicted features, where any given item represents the sense_sequence at
+        # that touch iter in the overal inference process, followed by the
+        # subsequent prediction
+
+        # Hold useful data for visualizing when and why classification using a relative
+        # activation threshold succeeds or fails
+        classification_visualization = {}
+        classification_visualization["classified"] = []
+        classification_visualization["proportion"] = []
+        classification_visualization["step"] = []
+
+        additional_prediction_sensations = True  # Iteratively repeat sensation
+        # sequence if convergence is successful, using the final sensation
+        # to build up a prediction of what the network predicts in every part of the
+        # image after its successfully converged to a single representation
+        prediction_iter = 0
+
+        while additional_prediction_sensations:
+
+            print("Resetting network state")
+            self.reset()
+            currentStep = 0  # noqa: N806
+            inferred = False
+            single_converged = False  # True when location representation has converged
+            # to that of a single object (i.e. location layer has a single object in
+            # its representation, not a union of multiple possible objects)
+
+            # Abort time-consuming generation of predictions after inference if
+            # not needed
+            if not visualize_predictions_bool:
+                additional_prediction_sensations = False
 
             for i_feature in touchSequence:
-                currentStep += 1
+
+                # Once converged to a single representation, progress through the
+                # additional unsensed regions to predict what is present
+                if single_converged:
+
+                    if ((currentStep + prediction_iter)
+                            == inputGridDimension * inputGridDimension):
+                        additional_prediction_sensations = False
+                        print("Reached end of predictions for this object.")
+                        break
+
+                    # Feature never sensed before convergence to single rep
+                    # Ensures that visualization of predictions samples the entire
+                    # unsensed space of the object.
+                    i_feature = touchSequence[currentStep + prediction_iter]
+
                 feature = objectDescription["features"][i_feature]
 
-                self._move(feature, randomLocation=randomLocation)
+                # If the condition is desired, use an alternative, random
+                # sequence of touches to derive movement information, which is
+                # inconsistent with the sequence determining sensory inputs
+                if false_motor_information:
 
-                pre_touch_location_list = self.column.get_location_copy()  # Save
-                # representation for later
+                    false_move_i = false_touchSequence[currentStep]
+
+                    self._move(objectDescription["features"][false_move_i])
+
+                else:
+
+                    self._move(feature)
 
                 featureSDR = self.features[feature["name"]]  # noqa: N806
 
                 self._sense(featureSDR, learn=False, waitForSettle=False)
+                # Note re. visualizing predictions, _sense of the feature
+                # itself does not inform the predicted columns on this
+                # touch iteration (and thus does not invalidate the
+                # prediction as a genuine prediction), but it does ensure the
+                # BasalPredictedCells have been updated from the movement, and
+                # we re-set the network state after performing each
+                # post-convergance prediction
 
                 predictedColumns = map(int, list(set(np.floor(  # noqa: N806
                     self.column.L4.getBasalPredictedCells() / cellsPerColumn))))
-                # Note _sense of the feature itself does not change the predicted
-                # columns on this touch iteration (and thus does not invalidate the
-                # prediction), but it does ensure the BasalPredictedCells have been
-                # updated following the movement, and we re-set the location
-                # representation later once in post-inference
 
-                # Include all previously sensed/predicted representaitons by
-                # over-writing current_sequence
-                current_sequence = sense_sequence[:]
+                currentStep += 1
 
-                current_sequence.append(list(predictedColumns))  # include the newly
-                # predicted columns
+                # Only collect the initial sensation sequence on the first pass
+                if prediction_iter == 0:
 
-                if currentStep == 1:  # On the first step, record the input sensation
-                    prediction_sequence.append([featureSDR[:]])
+                    # Include all previously sensed/predicted representaitons by
+                    # over-writing current_sequence
+                    current_sequence = sense_sequence[:]
+
+                    current_sequence.append(list(predictedColumns))  # include
+                    # the newly predicted columns
+
+                    if currentStep == 1:  # On the first step, record the input
+                        # sensation
+                        prediction_sequence.append([featureSDR[:]])
+
+                    else:
+                        prediction_sequence.append(current_sequence)
+
+                    # Record ground truth if not yet at converged representation
+                    if not single_converged:
+                        sense_sequence.append(featureSDR[:])
+
+                    else:
+                        # Once converged to a single representation has taken place,
+                        # sense_sequence accumalates predictions
+
+                        sense_sequence.append(list(predictedColumns))
+                        prediction_iter += 1
+                        break
 
                 else:
-                    prediction_sequence.append(current_sequence)
 
-                if not inferred:
-                    sense_sequence.append(featureSDR[:])
+                    if single_converged:
 
-                else:
-                    # Re-set location representations after inference successful so
-                    # that additional sensations don't influence predictions, and we
-                    # can use the output predictions to visualize what the network sees
-                    # across the rest of the input space
-                    module_iter = 0
-                    for module in self.column.L6aModules:
-                        module.activeCells = pre_touch_location_list[module_iter]
-                        module_iter += 1
+                        current_sequence = sense_sequence[:]
 
-                    # Once inference has taken place, sense_sequence gathers
-                    # predictions
-                    sense_sequence.append(list(predictedColumns))
+                        current_sequence.append(list(predictedColumns))  # include the
+                        # newly predicted columns
 
-                if not inferred:
-                    # Use the sensory-activated cells to detect whether the object has
-                    # been recognized. If these sensory-activated cells
-                    # are correct, it implies that the input layer's representation is
-                    # classifiable -- the location layer just correctly classified it.
+                        prediction_sequence.append(current_sequence)
 
+                        sense_sequence.append(list(predictedColumns))
+                        prediction_iter += 1
+                        break
+
+                # Continue integrating sensory information to update location
+                # representations until the object has both been inferred and the
+                # location rep has converged to the size of a single object (which
+                # enables visualization later by a decoder)
+                if not single_converged:
+
+                    # Use the sensory-activated location cells to detect whether
+                    # the object has been recognized.
                     representation = \
                         self.column.getSensoryAssociatedLocationRepresentation()
 
-                    classification_list = []
+                    max_active_proportion = 0.0  # Relative activation of the maximally
+                    # active class neuron
 
-                    if len(set(representation)) > 0:
+                    if (len(representation) == 40) and (inferred is True):
+                        # Handles the situation where inference proceeds single-rep
+                        # convergence
 
-                        # Check the representation against all possible target classes
-                        for target_iter in range(10):
-                            target_representations = \
-                                all_class_targets[target_iter][i_feature]
+                        single_converged = True
+                        print("Inferred and now converged to a single representation")
+                        single_converged_step = currentStep
 
-                            if (set(representation) <= target_representations):
-                                classification_list.append(target_iter)
-                                print("Classified as a " + str(target_iter)
-                                      + " with ground truth of "
-                                      + objectDescription["name"])
+                    if not inferred:
 
-                    if len(classification_list) > 1:
-                        print("Classification list : classified as multiple classes!")
-                        print(classification_list)
+                        # NB a minimum number of steps are required before inference
+                        # takes place; this reduces false positives in very early
+                        # inference
+                        if (len(set(representation)) > 0) and (currentStep >= 5):
 
-                        print("***Provisional code to handle multiple classes"
-                              "implemented, but as never experienced, the reliability"
-                              "of the intersection resolution is untested***")
-                        exit()
+                            # Vector to store 1 where a location has been active
+                            active_loc_vector = np.zeros(
+                                np.shape(self.class_weights)[0])
 
-                        intersection_list = []
+                            active_loc_vector[representation] = 1
 
-                        # Check the amount of overlap between the representations of
-                        for ambiguous_class_iter in range(len(classification_list)):
+                            class_node_activations = np.matmul(active_loc_vector,
+                                                               self.class_weights)
 
-                            intersection_list.append(
-                                len(set(representation).intersection(
-                                    all_class_targets[
-                                        classification_list[
-                                            ambiguous_class_iter]][i_feature])))
+                            # Track the proportion by which the most active node is
+                            # firing, as well as whether it's the correct node
+                            max_active_proportion = (np.max(class_node_activations)
+                                                     / np.sum(class_node_activations))
 
-                        # *** note this does not deal with Numpy's behaviour if two
-                        # locations have the same maximum value -->
-                        # see https://numpy.org/doc/stable/reference/
-                        # generated/numpy.argmax.html
+                            # For later plotting of classification behaviour
+                            # Useful in hyperparameter tuning
+                            classification_visualization["classified"].append(
+                                np.argmax(class_node_activations)
+                                == int(objectDescription["name"][0]))
+                            classification_visualization["proportion"].append(
+                                max_active_proportion)
+                            classification_visualization["step"].append(
+                                currentStep)
 
-                        print("Intersection list:")
-                        print(intersection_list)
-                        classification_list = classification_list[
-                            np.armax(intersection_list)]
+                        inferred = (max_active_proportion >= class_threshold)
 
-                        print("After checking intersections, resolved to:")
-                        print(classification_list)
+                        if inferred:
+                            if np.argmax(class_node_activations) \
+                                    == int(objectDescription["name"][0]):
+                                print("Correctly classified "
+                                      + objectDescription["name"][0])
+                                inferredStep = currentStep  # noqa: N806
+                                plt.imsave("correctly_classified/"
+                                           + objectDescription["name"]
+                                           + ".png", objectImage)
+                                incorrect = {"never_converged": 0,
+                                             "false_convergence": 0}
 
-                    inferred = (len(classification_list) == 1)
+                                if len(representation) == 40:
 
-                    if inferred:
-                        if classification_list[0] == int(objectDescription["name"][0]):
-                            print("Correctly classified")
-                            inferredStep = currentStep  # noqa: N806
-                            plt.imsave("correctly_classified/trial_" + str(trial_iter)
-                                       + "_" + objectDescription["name"]
-                                       + ".png", objectImage)
-                            incorrect = {"never_converged": 0, "false_convergence": 0}
+                                    print("Converged to a single representation and"
+                                          " now inferred")
+                                    single_converged = True
+                                    single_converged_step = currentStep
 
-                        else:
-                            print("Incorrectly classified")
-                            incorrect = {"never_converged": 0, "false_convergence": 1}
-                            plt.imsave("misclassified/trial_" + str(trial_iter)
-                                       + "_example_" + objectDescription["name"]
-                                       + "_converged_to_" + str(classification_list[0])
-                                       + ".png", objectImage)
-                            return None, incorrect, prediction_sequence, touchSequence
+                            else:
+                                print("Incorrectly classified a "
+                                      + objectDescription["name"][0]
+                                      + " as a "
+                                      + str(np.argmax(class_node_activations)))
+                                incorrect = {"never_converged": 0,
+                                             "false_convergence": 1}
+                                plt.imsave("misclassified/example_"
+                                           + objectDescription["name"]
+                                           + "_converged_to_"
+                                           + str(np.argmax(class_node_activations))
+                                           + ".png", objectImage)
 
-                finished = ((((inferred and numSensations is None)
-                            or (numSensations is not None and currentStep
-                                == numSensations))) and currentStep == 25)
-                # Continuing to step 25 ensures we gather network predictions even after
-                # inference is successful
+                                return (None, incorrect, prediction_sequence,
+                                        touchSequence, classification_visualization,
+                                        None)
 
-                if finished:
+                if ((inferred and (not visualize_predictions_bool))
+                        or (currentStep == inputGridDimension * inputGridDimension)):
+                    additional_prediction_sensations = False
                     break
 
-            prevTouchSequence = touchSequence  # noqa: N806
+        if incorrect["never_converged"]:
+            print("Never converged!")
 
-            if finished:
-                break
-
-        if incorrect["never_converged"] == 1:
-            print("\nNever converged!")
-            print("Inferred step when never converged " + str(inferredStep))
-
-        return inferredStep, incorrect, prediction_sequence, touchSequence
+        return (inferredStep, incorrect, prediction_sequence, touchSequence,
+                classification_visualization, single_converged_step)

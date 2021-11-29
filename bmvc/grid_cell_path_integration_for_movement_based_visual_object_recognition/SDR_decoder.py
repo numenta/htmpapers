@@ -19,7 +19,8 @@
 #
 
 """
-Trains a decoder to reconstruct input images from SDRs
+Trains a decoder to reconstruct input images from SDRs produced
+by a CNN's middle layers
 """
 
 import math
@@ -32,8 +33,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import datasets
 
-torch.manual_seed(18)
-np.random.seed(18)
+seed_val = 1
+torch.manual_seed(seed_val)
+np.random.seed(seed_val)
 
 DATASET = "mnist"
 TRAIN_NEW_NET = True
@@ -103,6 +105,8 @@ def initialize():
         np.load("python2_htm_docker/docker_dir/training_and_testing_data/"
                 + DATASET + "_labels_SDR_classifiers_training.npy"))
 
+    np.save("python2_htm_docker/docker_dir/training_and_testing_data/" + DATASET
+            + "_images_base_net_training", training_sources)
     np.save("python2_htm_docker/docker_dir/training_and_testing_data/" + DATASET
             + "_images_SDR_classifiers_training", testing_decoder_sources)
     np.save("python2_htm_docker/docker_dir/training_and_testing_data/" + DATASET

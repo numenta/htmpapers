@@ -27,6 +27,8 @@ KNN_PROGRESSIVE_SENSATIONS_BOOL=True
 import matplotlib.pyplot as plt
 import numpy as np
 
+INPUT_GRID_DIMENSION = 5
+
 
 def plot_sensations_to_inference(object_prediction_sequences):
 
@@ -40,7 +42,7 @@ def plot_sensations_to_inference(object_prediction_sequences):
     cumm_percent_inferred = []
     num_correct = 0
 
-    for num_sensation_iter in range(25):
+    for num_sensation_iter in range(INPUT_GRID_DIMENSION * INPUT_GRID_DIMENSION):
 
         num_correct += len(
             np.nonzero(np.array(num_sensations_list) == (num_sensation_iter + 1))[0])
@@ -48,12 +50,15 @@ def plot_sensations_to_inference(object_prediction_sequences):
         cumm_percent_inferred.append(num_correct
                                      / len(object_prediction_sequences))
 
-    plt.scatter(list(range(1, 26)), cumm_percent_inferred)
+    plt.scatter(list(range(1, INPUT_GRID_DIMENSION * INPUT_GRID_DIMENSION + 1)),
+                cumm_percent_inferred)
     plt.ylim(0, 1)
     plt.show()
 
     print("Cummulative percent inferred as a function of the number of sensations")
     print(cumm_percent_inferred)
+
+    return cumm_percent_inferred
 
 
 if __name__ == "__main__":

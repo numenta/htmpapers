@@ -1,3 +1,3 @@
 nupic.torch @ git+https://github.com/numenta/nupic.torch.git@0682f8e#egg=nupic.torch
-nupic.research @ git+https://github.com/numenta/nupic.research.git@4852f3b7#egg=nupic.research
+nupic.research @ git+https://github.com/numenta/nupic.research.git@5ae74787#egg=nupic.research
 scikit-learn==1.0
