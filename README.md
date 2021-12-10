@@ -61,5 +61,5 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [8_src]: biorxiv/going_beyond_the_point_neuron
 [9]: https://www.bmvc2021-virtualconference.com/conference/papers/paper_1506.html
 [9_src]: bmvc/grid_cell_path_integration_for_movement_based_visual_object_recognition
-[10]: https://github.com/numenta/nupic.embodied/tree/master/projects/multitask
-[10_src]: https://github.com/numenta/nupic.embodied/tree/master/projects/multitask
+[10]: https://github.com/numenta/nupic.embodied/tree/frontiers/projects/multitask
+[10_src]: https://github.com/numenta/nupic.embodied/tree/frontiers/projects/multitask
