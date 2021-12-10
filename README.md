@@ -3,7 +3,9 @@ This repository contains reproducible code for selected Numenta papers. It is cu
 
 ### Avoiding Catastrophe: Active Dendrites Enable Multi-task Learning in Dynamic Environments
 In this paper we show that the biophysical properties of dendrites, synapses, and local inhibitory systems enable networks to dynamically restrict and route information in a context-specific manner. First, we propose a novel artificial neural network architecture that incorporates active dendrites and sparse representations into the standard deep learning framework. Next, we study the performance of this architecture in two separate benchmarks requiring task-based adaptation: Meta-World, a multi-task reinforcement learning environment where a robotic agent must learn to solve a variety of manipulation tasks simultaneously; and a continual learning benchmark in which the model’s prediction task changes throughout training.
-> [Sources][10_src]
+> [Source: multitask reinforcement learning][10_src]
+
+> [Source: continual supervised learning][8_src]
 
 ### [Grid Cell Path Integration For Movement-Based Visual Object Recognition][9]
 This paper demonstrates the implementation of a sensorimotor network that uses grid-cell computations to process a sequence of visual inputs, specifically a sequence of image patches from the MNIST dataset. The network is able to classify novel digits (as well as perform other tasks) in a way that is robust to the specific sequence over which the visual space is sampled, a challenging setting for typical machine learning approaches. The work builds on our previous paper, “Locations in the Neocortex."
