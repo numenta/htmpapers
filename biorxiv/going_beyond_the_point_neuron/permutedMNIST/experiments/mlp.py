@@ -31,15 +31,15 @@ import ray.tune as tune
 import torch
 import torch.nn.functional as F
 
+from nupic.research.frameworks.continual_learning import mixins as cl_mixins
 from nupic.research.frameworks.dendrites.dendrite_cl_experiment import (
     DendriteContinualLearningExperiment,
 )
 from nupic.research.frameworks.pytorch.datasets import PermutedMNIST
 from nupic.research.frameworks.pytorch.models import ModifiedInitStandardMLP
-from nupic.research.frameworks.vernon import mixins
 
 
-class MLPExperiment(mixins.PermutedMNISTTaskIndices,
+class MLPExperiment(cl_mixins.PermutedMNISTTaskIndices,
                     DendriteContinualLearningExperiment):
     pass
 
@@ -99,6 +99,13 @@ THREE_LAYER_MLP_100.update(
     # MLP
     epochs=3,
     optimizer_args=dict(lr=1e-6)
+)
+
+
+THREE_LAYER_MLP_250 = deepcopy(THREE_LAYER_MLP_100)
+THREE_LAYER_MLP_250.update(
+    num_tasks=250,
+    num_classes=10 * 250,
 )
 
 
