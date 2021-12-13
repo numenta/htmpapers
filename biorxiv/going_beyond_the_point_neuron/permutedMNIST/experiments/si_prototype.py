@@ -32,25 +32,27 @@ import ray.tune as tune
 import torch
 import torch.nn.functional as F
 
+from nupic.research.frameworks.continual_learning import mixins as cl_mixins
 from nupic.research.frameworks.dendrites import DendriticMLP
+from nupic.research.frameworks.dendrites import mixins as dendrites_mixins
 from nupic.research.frameworks.dendrites.dendrite_cl_experiment import (
     DendriteContinualLearningExperiment,
 )
 from nupic.research.frameworks.pytorch.datasets import PermutedMNIST
-from nupic.research.frameworks.vernon import mixins
+from nupic.research.frameworks.vernon import mixins as vernon_mixins
 
 
-class SICentroidExperiment(mixins.SynapticIntelligence,
-                           mixins.RezeroWeights,
-                           mixins.CentroidContext,
-                           mixins.PermutedMNISTTaskIndices,
-                           DendriteContinualLearningExperiment):
+class SIPrototypeExperiment(cl_mixins.SynapticIntelligence,
+                            vernon_mixins.RezeroWeights,
+                            dendrites_mixins.PrototypeContext,
+                            cl_mixins.PermutedMNISTTaskIndices,
+                            DendriteContinualLearningExperiment):
     pass
 
 
 # Synaptic Intelligence + Dendrites on 10 permutedMNIST tasks
-SI_CENTROID_10 = dict(
-    experiment_class=SICentroidExperiment,
+SI_PROTOTYPE_10 = dict(
+    experiment_class=SIPrototypeExperiment,
     num_samples=8,
 
     # Results path
@@ -103,18 +105,18 @@ SI_CENTROID_10 = dict(
 )
 
 # Synaptic Intelligence + Dendrites on 50 permutedMNIST tasks
-SI_CENTROID_50 = deepcopy(SI_CENTROID_10)
-SI_CENTROID_50["dataset_args"].update(num_tasks=50)
-SI_CENTROID_50["model_args"].update(num_segments=50)
-SI_CENTROID_50.update(
+SI_PROTOTYPE_50 = deepcopy(SI_PROTOTYPE_10)
+SI_PROTOTYPE_50["dataset_args"].update(num_tasks=50)
+SI_PROTOTYPE_50["model_args"].update(num_segments=50)
+SI_PROTOTYPE_50.update(
     num_tasks=50,
     num_classes=10 * 50,
 )
 
-SI_CENTROID_100 = deepcopy(SI_CENTROID_50)
-SI_CENTROID_100["dataset_args"].update(num_tasks=100)
-SI_CENTROID_100["model_args"].update(num_segments=100)
-SI_CENTROID_100.update(
+SI_PROTOTYPE_100 = deepcopy(SI_PROTOTYPE_50)
+SI_PROTOTYPE_100["dataset_args"].update(num_tasks=100)
+SI_PROTOTYPE_100["model_args"].update(num_segments=100)
+SI_PROTOTYPE_100.update(
     num_tasks=100,
     num_classes=10 * 100,
     optimizer_args=dict(lr=5e-4),
@@ -124,13 +126,13 @@ SI_CENTROID_100.update(
 # -------------------------- HYPERPARAMETER SEARCH CONFIGS -------------------------- #
 
 # HP search on dendrites for 10 tasks with SI FF + SI Dendrites.
-SI_CENTROID_HP_10 = deepcopy(SI_CENTROID_10)
-SI_CENTROID_HP_10["model_args"].update(
+SI_PROTOTYPE_HP_10 = deepcopy(SI_PROTOTYPE_10)
+SI_PROTOTYPE_HP_10["model_args"].update(
     kw_percent_on=0.1,
     weight_sparsity=0.5,
     num_segments=tune.grid_search([2, 3, 5, 7, 10, 14, 20, 30, 50, 100])
 )
-SI_CENTROID_HP_10.update(
+SI_PROTOTYPE_HP_10.update(
     tasks_to_validate=[9],
 
     si_args=dict(
@@ -141,13 +143,13 @@ SI_CENTROID_HP_10.update(
 )
 
 # HP search on dendrites for 10 tasks with SI FF.
-SI_CENTROID_HP_10_CONTROL = deepcopy(SI_CENTROID_HP_10)
-SI_CENTROID_HP_10_CONTROL["model_args"].update(
+SI_PROTOTYPE_HP_10_CONTROL = deepcopy(SI_PROTOTYPE_HP_10)
+SI_PROTOTYPE_HP_10_CONTROL["model_args"].update(
     kw_percent_on=0.1,
     weight_sparsity=0.5,
     num_segments=tune.grid_search([2, 3, 5, 7, 10, 14, 20, 30, 50, 100])
 )
-SI_CENTROID_HP_10_CONTROL.update(
+SI_PROTOTYPE_HP_10_CONTROL.update(
     tasks_to_validate=[10],
 
     si_args=dict(
@@ -158,13 +160,13 @@ SI_CENTROID_HP_10_CONTROL.update(
 )
 
 # Test on 50 tasks with SI FF + SI Dendrites.
-SI_CENTROID_50_TEST_WITH_SI = deepcopy(SI_CENTROID_50)
-SI_CENTROID_50_TEST_WITH_SI["model_args"].update(
+SI_PROTOTYPE_50_TEST_WITH_SI = deepcopy(SI_PROTOTYPE_50)
+SI_PROTOTYPE_50_TEST_WITH_SI["model_args"].update(
     kw_percent_on=0.1,
     weight_sparsity=0.5,
     num_segments=50
 )
-SI_CENTROID_50_TEST_WITH_SI.update(
+SI_PROTOTYPE_50_TEST_WITH_SI.update(
     num_samples=8,
     tasks_to_validate=[49],
 
@@ -177,10 +179,10 @@ SI_CENTROID_50_TEST_WITH_SI.update(
 
 # Export configurations in this file
 CONFIGS = dict(
-    si_centroid_10=SI_CENTROID_10,
-    si_centroid_50=SI_CENTROID_50,
-    si_centroid_100=SI_CENTROID_100,
-    si_centroid_hp_10=SI_CENTROID_HP_10,
-    si_centroid_hp_10_control=SI_CENTROID_HP_10_CONTROL,
-    si_centroid_50_test_with_si=SI_CENTROID_50_TEST_WITH_SI
+    si_prototype_10=SI_PROTOTYPE_10,
+    si_prototype_50=SI_PROTOTYPE_50,
+    si_prototype_100=SI_PROTOTYPE_100,
+    si_prototype_hp_10=SI_PROTOTYPE_HP_10,
+    si_prototype_hp_10_control=SI_PROTOTYPE_HP_10_CONTROL,
+    si_prototype_50_test_with_si=SI_PROTOTYPE_50_TEST_WITH_SI
 )

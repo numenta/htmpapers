@@ -21,7 +21,7 @@
 """
 Experiment file that runs networks which continually learn on permutedMNIST, but use
 either active dendrites or sparse representations (via k-Winners), but not both. All
-networks use the centroid method to infer context vectors at teset time.
+networks use the prototype method to infer context vectors at test time.
 """
 
 import os
@@ -32,29 +32,31 @@ import ray.tune as tune
 import torch
 import torch.nn.functional as F
 
+from nupic.research.frameworks.continual_learning import mixins as cl_mixins
 from nupic.research.frameworks.dendrites import (
     AbsoluteMaxGatingDendriticLayer,
     DendriticMLP,
     ZeroSegmentDendriticLayer,
 )
+from nupic.research.frameworks.dendrites import mixins as dendrites_mixins
 from nupic.research.frameworks.dendrites.dendrite_cl_experiment import (
     DendriteContinualLearningExperiment,
 )
 from nupic.research.frameworks.pytorch.datasets import PermutedMNIST
-from nupic.research.frameworks.vernon import mixins
+from nupic.research.frameworks.vernon import mixins as vernon_mixins
 
 
-class CentroidExperiment(mixins.RezeroWeights,
-                         mixins.CentroidContext,
-                         mixins.PermutedMNISTTaskIndices,
-                         DendriteContinualLearningExperiment):
+class PrototypeExperiment(vernon_mixins.RezeroWeights,
+                          dendrites_mixins.PrototypeContext,
+                          cl_mixins.PermutedMNISTTaskIndices,
+                          DendriteContinualLearningExperiment):
     pass
 
 
 # ------------------------ CONFIGS FOR ACTIVE DENDRITES ONLY ------------------------ #
 
 ACTIVE_DENDRITES_ONLY_BASE = dict(
-    experiment_class=CentroidExperiment,
+    experiment_class=PrototypeExperiment,
     num_samples=8,
 
     # Results path
@@ -179,7 +181,7 @@ ACTIVE_DENDRITES_ONLY_100.update(
 # --------------------- CONFIGS FOR SPARSE REPRESENTATIONS ONLY --------------------- #
 
 SPARSE_REPRESENTATIONS_ONLY_BASE = dict(
-    experiment_class=CentroidExperiment,
+    experiment_class=PrototypeExperiment,
     num_samples=8,
 
     # Results path
