@@ -13,9 +13,13 @@ Below are instructions for reproducing all the charts and tables presented in th
 ### Prerequisites
 
 All the scripts in this directory were implemented using python 3.8. See [requirements.txt](./requirements.txt) for extra dependencies. 
-When using anaconda virtual environment all you need to do is run the following command and conda will install everything for you. See environment.yml:
+When using anaconda virtual environment, run the following command and conda will install everything for you. See environment.yml:
 
      conda env create
+
+Once you have activated your virtual environment, run the following command before proceeding with experiments:
+
+     ray stop; ray start --head
 
 ### Experiment configurations
 

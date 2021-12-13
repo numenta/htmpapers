@@ -1,2 +1,5 @@
 nupic.torch @ git+https://github.com/numenta/nupic.torch.git@0682f8e#egg=nupic.torch
-nupic.research[dendrites] @ git+https://github.com/numenta/nupic.research.git@85d9961#egg=nupic.research
+nupic.research @ git+https://github.com/numenta/nupic.research.git@85d9961#egg=nupic.research
+nupic.research.ray @ git+https://github.com/numenta/nupic.research.git@85d9961#egg=nupic.research.dendrites&subdirectory=packages/ray
+nupic.research.continual_learning @ git+https://github.com/numenta/nupic.research.git@85d9961#egg=nupic.research.dendrites&subdirectory=packages/continual_learning
+nupic.research.dendrites @ git+https://github.com/numenta/nupic.research.git@85d9961#egg=nupic.research.dendrites&subdirectory=packages/dendrites
