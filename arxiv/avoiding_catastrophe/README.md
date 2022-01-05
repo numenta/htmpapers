@@ -1,0 +1,10 @@
+# Avoiding Catastrophe: Active Dendrites Enable Multi-task Learning in Dynamic Environments
+
+The code for the multi-task reinforcement learning (multi-task RL) portion of this project can be found at:
+> [Sources][1]
+
+The code for the continual learning (on permutedMNIST) portion of this project can be found at:
+> [Sources][2]
+
+[1]: https://github.com/numenta/nupic.embodied/tree/frontiers/projects/multitask
+[2]: https://github.com/numenta/htmpapers/tree/master/biorxiv/going_beyond_the_point_neuron
