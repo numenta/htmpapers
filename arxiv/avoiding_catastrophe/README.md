@@ -7,4 +7,4 @@ The code for the continual learning (on permutedMNIST) portion of this project c
 > [Sources][2]
 
 [1]: https://github.com/numenta/nupic.embodied/tree/frontiers/projects/multitask
-[2]: https://github.com/numenta/htmpapers/tree/master/biorxiv/going_beyond_the_point_neuron
+[2]: https://github.com/numenta/nupic.research/tree/master/projects/dendrites
