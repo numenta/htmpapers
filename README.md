@@ -1,6 +1,10 @@
 # Numenta research papers code and data
 This repository contains reproducible code for selected Numenta papers. It is currently under construction and will eventually include the source code for all the scripts used in Numenta's papers.
 
+### [Avoiding Catastrophe: Active Dendrites Enable Multi-task Learning in Dynamic Environments][10]
+In this paper we show that the biophysical properties of dendrites, synapses, and local inhibitory systems enable networks to dynamically restrict and route information in a context-specific manner. First, we propose a novel artificial neural network architecture that incorporates active dendrites and sparse representations into the standard deep learning framework. Next, we study the performance of this architecture in two separate benchmarks requiring task-based adaptation: Meta-World, a multi-task reinforcement learning environment where a robotic agent must learn to solve a variety of manipulation tasks simultaneously; and a continual learning benchmark in which the model’s prediction task changes throughout training.
+> [Sources][10_src]
+
 ### [Grid Cell Path Integration For Movement-Based Visual Object Recognition][9]
 This paper demonstrates the implementation of a sensorimotor network that uses grid-cell computations to process a sequence of visual inputs, specifically a sequence of image patches from the MNIST dataset. The network is able to classify novel digits (as well as perform other tasks) in a way that is robust to the specific sequence over which the visual space is sampled, a challenging setting for typical machine learning approaches. The work builds on our previous paper, “Locations in the Neocortex."
 > [Sources][9_src]
@@ -55,3 +59,6 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [8_src]: biorxiv/going_beyond_the_point_neuron
 [9]: https://www.bmvc2021-virtualconference.com/conference/papers/paper_1506.html
 [9_src]: bmvc/grid_cell_path_integration_for_movement_based_visual_object_recognition
+[10]: https://arxiv.org/abs/2201.00042
+[10_src]: arxiv/avoiding_catastrophe
+
