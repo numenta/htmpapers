@@ -60,4 +60,4 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [9]: https://www.bmvc2021-virtualconference.com/conference/papers/paper_1506.html
 [9_src]: bmvc/grid_cell_path_integration_for_movement_based_visual_object_recognition
 [10]: https://arxiv.org/abs/2201.00042
-[10_src]: frontiers/active_dendrites_enable_multitask_learning
+[10_src]: arxiv/avoiding_catastrophe

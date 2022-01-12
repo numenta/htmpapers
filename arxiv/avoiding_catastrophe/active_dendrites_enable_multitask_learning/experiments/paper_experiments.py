@@ -330,7 +330,7 @@ dendrite_run_random_seed.update(
     fp16=True,
     preprocess_module_type=None,
     dendritic_layer_class="abs_max_gating_signed",
-    wandb_group="Paper Figures",
+    wandb_group="MT10: Experimentation",
     evaluation_frequency=10,
     share_train_eval_env=True,
     task_update_frequency=1e12,
