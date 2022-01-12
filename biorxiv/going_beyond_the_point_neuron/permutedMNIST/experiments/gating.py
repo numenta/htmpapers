@@ -26,56 +26,57 @@ gating, etc.
 
 from copy import deepcopy
 
+from nupic.research.frameworks.continual_learning import mixins as cl_mixins
 from nupic.research.frameworks.dendrites import (
     AbsoluteMaxGatingDendriticLayer,
     BiasingDendriticLayer,
     GatingDendriticLayer,
 )
+from nupic.research.frameworks.dendrites import mixins as dendrites_mixins
 from nupic.research.frameworks.dendrites.dendrite_cl_experiment import (
     DendriteContinualLearningExperiment,
 )
-from nupic.research.frameworks.dendrites.mixins import EvalPerTask
-from nupic.research.frameworks.vernon import mixins
+from nupic.research.frameworks.vernon import mixins as vernon_mixins
 
-from .centroid import CENTROID_10
+from .prototype import PROTOTYPE_10
 
 
-class CentroidExperimentEvalPerTask(EvalPerTask,
-                                    mixins.RezeroWeights,
-                                    mixins.CentroidContext,
-                                    mixins.PermutedMNISTTaskIndices,
-                                    DendriteContinualLearningExperiment):
+class PrototypeExperimentEvalPerTask(dendrites_mixins.EvalPerTask,
+                                     vernon_mixins.RezeroWeights,
+                                     dendrites_mixins.PrototypeContext,
+                                     cl_mixins.PermutedMNISTTaskIndices,
+                                     DendriteContinualLearningExperiment):
     pass
 
 
-CENTROID_10_EVAL_PER_TASK = deepcopy(CENTROID_10)
-CENTROID_10_EVAL_PER_TASK.update(
-    experiment_class=CentroidExperimentEvalPerTask,
+PROTOTYPE_10_EVAL_PER_TASK = deepcopy(PROTOTYPE_10)
+PROTOTYPE_10_EVAL_PER_TASK.update(
+    experiment_class=PrototypeExperimentEvalPerTask,
     tasks_to_validate=list(range(10)),
 )
 
 
-CENTROID_10_DENDRITE_BIAS = deepcopy(CENTROID_10_EVAL_PER_TASK)
-CENTROID_10_DENDRITE_BIAS["model_args"].update(
+PROTOTYPE_10_DENDRITE_BIAS = deepcopy(PROTOTYPE_10_EVAL_PER_TASK)
+PROTOTYPE_10_DENDRITE_BIAS["model_args"].update(
     dendritic_layer_class=BiasingDendriticLayer
 )
 
 
-CENTROID_10_DENDRITE_GATE = deepcopy(CENTROID_10_EVAL_PER_TASK)
-CENTROID_10_DENDRITE_GATE["model_args"].update(
+PROTOTYPE_10_DENDRITE_GATE = deepcopy(PROTOTYPE_10_EVAL_PER_TASK)
+PROTOTYPE_10_DENDRITE_GATE["model_args"].update(
     dendritic_layer_class=GatingDendriticLayer
 )
 
 
-CENTROID_10_DENDRITE_ABSMAXGATE = deepcopy(CENTROID_10_EVAL_PER_TASK)
-CENTROID_10_DENDRITE_ABSMAXGATE["model_args"].update(
+PROTOTYPE_10_DENDRITE_ABSMAXGATE = deepcopy(PROTOTYPE_10_EVAL_PER_TASK)
+PROTOTYPE_10_DENDRITE_ABSMAXGATE["model_args"].update(
     dendritic_layer_class=AbsoluteMaxGatingDendriticLayer
 )
 
 CONFIGS = dict(
-    centroid_10_eval_per_task=CENTROID_10_EVAL_PER_TASK,
-    centroid_10_dendrite_bias=CENTROID_10_DENDRITE_BIAS,
-    centroid_10_dendrite_absmaxgate=CENTROID_10_DENDRITE_ABSMAXGATE,
-    centroid_10_dendrite_gate=CENTROID_10_DENDRITE_GATE,
+    prototype_10_eval_per_task=PROTOTYPE_10_EVAL_PER_TASK,
+    prototype_10_dendrite_bias=PROTOTYPE_10_DENDRITE_BIAS,
+    prototype_10_dendrite_absmaxgate=PROTOTYPE_10_DENDRITE_ABSMAXGATE,
+    prototype_10_dendrite_gate=PROTOTYPE_10_DENDRITE_GATE,
     # TODO: multiplicative but not gating
 )

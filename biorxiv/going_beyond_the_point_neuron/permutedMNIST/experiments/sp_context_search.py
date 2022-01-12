@@ -26,18 +26,19 @@ import numpy as np
 import ray.tune as tune
 import torch.nn as nn
 
+from nupic.research.frameworks.continual_learning import mixins as cl_mixins
 from nupic.research.frameworks.dendrites.dendrite_cl_experiment import (
     DendriteContinualLearningExperiment,
 )
 from nupic.research.frameworks.dendrites.mixins import SpatialPoolerAnalysis
 from nupic.research.frameworks.pytorch.datasets import PermutedMNIST
-from nupic.research.frameworks.vernon import mixins
+from nupic.research.frameworks.vernon import mixins as vernon_mixins
 from nupic.torch.modules import KWinners, SparseWeights
 
 
-class SPExperiment(mixins.RezeroWeights,
-                   mixins.UpdateBoostStrength,
-                   mixins.PermutedMNISTTaskIndices,
+class SPExperiment(vernon_mixins.RezeroWeights,
+                   vernon_mixins.UpdateBoostStrength,
+                   cl_mixins.PermutedMNISTTaskIndices,
                    SpatialPoolerAnalysis,
                    DendriteContinualLearningExperiment):
     pass
@@ -72,7 +73,7 @@ class SP(nn.Module):
         return self.kw(self.linear(x))
 
 
-# Centroid method for inferring contexts: 50 permutedMNIST tasks
+# Prototype method for inferring contexts: 50 permutedMNIST tasks
 SP_PROTOTYPE_50 = dict(
     experiment_class=SPExperiment,
     num_samples=1,

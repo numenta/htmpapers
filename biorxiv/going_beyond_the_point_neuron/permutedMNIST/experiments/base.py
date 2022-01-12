@@ -30,17 +30,18 @@ import ray.tune as tune
 import torch
 import torch.nn.functional as F
 
+from nupic.research.frameworks.continual_learning import mixins as cl_mixins
 from nupic.research.frameworks.dendrites import DendriticMLP
 from nupic.research.frameworks.dendrites.dendrite_cl_experiment import (
     DendriteContinualLearningExperiment,
 )
 from nupic.research.frameworks.pytorch.datasets import ContextDependentPermutedMNIST
-from nupic.research.frameworks.vernon import mixins
+from nupic.research.frameworks.vernon import mixins as vernon_mixins
 
 
 class PermutedMNISTExperiment(
-    mixins.RezeroWeights,
-    mixins.PermutedMNISTTaskIndices,
+    vernon_mixins.RezeroWeights,
+    cl_mixins.PermutedMNISTTaskIndices,
     DendriteContinualLearningExperiment,
 ):
     pass
@@ -62,7 +63,7 @@ DEFAULT_BASE = dict(
         root=os.path.expanduser("~/nta/results/data/"),
         dim_context=1024,
         seed=42,
-        download=False,  # Change to True if running for the first time
+        download=True,  # Change to True if running for the first time
     ),
 
     model_class=DendriticMLP,
