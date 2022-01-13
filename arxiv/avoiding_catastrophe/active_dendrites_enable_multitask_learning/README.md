@@ -7,7 +7,7 @@ For more details please contact lsouza at numenta dot com.
 
 ### Installation
 
-Important: MetaWorld requires Mujoco. For information about installing and acquiring a license, please refer to the [Mujoco github repo](https://github.com/openai/mujoco-py)
+Important: MetaWorld requires Mujoco. For information about installing and acquiring a license, refer to [Mujoco](https://www.roboti.us/license.html). Please install `mujoco200` as the Metaworld dependency included is not compatible with the new mujoco releases. [Here](https://github.com/openai/mujoco-py/tree/392c6e538101116f7e3079ab4e0eb53380dbe71b) you can find an older version of mujoco_py that describes how to install `mujoco200`.
 
 Once Mujoco is installed, create a new environment from the yaml file:
 `conda env create -f environment.yml`
