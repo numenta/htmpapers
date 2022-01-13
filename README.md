@@ -10,7 +10,7 @@ This paper demonstrates the implementation of a sensorimotor network that uses g
 > [Sources][9_src]
 
 ### [Going Beyond the Point Neuron: Active Dendrites and Sparse Representations for Continual Learning][8]
-In this paper we investigate how dendritic properties can add value to ANNs in the context of continual learning, an area where ANNs suffer from catastrophic forgetting 
+In this paper we investigate how dendritic properties can add value to ANNs in the context of continual learning, an area where ANNs suffer from catastrophic forgetting
 > [Sources][8_src]
 
 ### [How Can We Be So Dense? The Benefits of Using Highly Sparse Representations][7]
@@ -61,4 +61,3 @@ Foundational paper describing core HTM theory for sequence memory and its relati
 [9_src]: bmvc/grid_cell_path_integration_for_movement_based_visual_object_recognition
 [10]: https://arxiv.org/abs/2201.00042
 [10_src]: arxiv/avoiding_catastrophe
-
