@@ -29,4 +29,3 @@ pandas==1.3.0
 ray==1.3.0
 wandb==0.12.6
 torch==1.7.1
-numpy==1.21.2
