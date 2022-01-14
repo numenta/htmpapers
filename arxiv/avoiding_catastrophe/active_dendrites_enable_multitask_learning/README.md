@@ -17,6 +17,12 @@ For proper logging, make sure to set your `WANDB_API_KEY=<my_api_key>` and `WAND
 
 To save models, set the `CHECKPOINT_DIR=<path_to_checkpointing_directory>`. As before, make sure to set write permission for the user running the script.
 
+
+Alternatively, you may use [docker](https://www.docker.com) to run the experiments in a container:
+
+    docker build -t dendrite_mtrl .
+    docker run -it dendrite_mtrl /bin/bash
+
 ### Execution
 
 To run an experiment, first define a new experiment in a python module under the folder experiments. Please follow the example of other configs already created.
