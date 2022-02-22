@@ -31,4 +31,4 @@ To run, on projects/multitask call `python run.py -e <experiment_name>`
 
 ### Results
 
-For results shown in the paper Avoiding Catastrophe: Active Dendrites Enable Multi-task Learning in Dynamic Environments, refer to the [public wandb workspace](https://wandb.ai/nupic-research/multitask_journal)
+For results shown in the paper Avoiding Catastrophe: Active Dendrites Enable Multi-task Learning in Dynamic Environments, refer to the [public wandb workspace](https://wandb.ai/numenta/multitask_journal)
