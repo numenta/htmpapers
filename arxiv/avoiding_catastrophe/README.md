@@ -7,4 +7,4 @@ The code for the continual learning (on permutedMNIST) portion of this project c
 > [Sources][2]
 
 [1]: active_dendrites_enable_multitask_learning
-[2]: https://github.com/numenta/nupic.research/tree/81469dd/projects/dendrites
+[2]: https://github.com/numenta/htmpapers/tree/master/biorxiv/going_beyond_the_point_neuron
